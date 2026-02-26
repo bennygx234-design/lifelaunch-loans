@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeLaunch Loans — Borrow Smart. Launch Far.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS Variables ─── */
+    :root {
+      --bg:            #080F0A;
+      --bg2:           #0D1A10;
+      --surface:       #0F1F13;
+      --surface2:      #162A1A;
+      --border:        rgba(34,197,94,0.12);
+      --green:         #22C55E;
+      --green-dim:     #16A34A;
+      --green-glow:    rgba(34,197,94,0.15);
+      --text-primary:  #F0FDF4;
+      --text-secondary:#86EFAC;
+      --text-muted:    rgba(74,222,128,0.4);
+      --amber:         #F59E0B;
+    }
+
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; }
+    img, svg { display: block; }
+
+    /* ─── Utility Classes ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .chip {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      margin-bottom: 1.2rem;
+    }
+    .section-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+    }
+    .btn-green {
+      background: var(--green);
+      color: #080F0A;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 0 20px rgba(34,197,94,0.35);
+      transition: all 0.2s ease;
+      animation: glowPulse 2.6s ease-in-out infinite;
+    }
+    .btn-green:hover { background: #28d968; box-shadow: 0 0 32px rgba(34,197,94,0.55); transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+
+    /* ─── Keyframes ─── */
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(34,197,94,0.35); }
+      50%       { box-shadow: 0 0 38px rgba(34,197,94,0.65); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ════════════════════════════════════════
+       1. NAVBAR
+    ════════════════════════════════════════ */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      padding: 1rem 0;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(8,15,10,0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 14px rgba(34,197,94,0.4);
+    }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.22rem;
+    }
+    .nav-logo-text .bold  { font-weight: 800; color: var(--text-primary); }
+    .nav-logo-text .light { font-weight: 400; color: var(--text-secondary); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--green); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-signin {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .nav-signin:hover { border-color: var(--border); color: var(--text-primary); }
+    .nav-cta {
+      font-size: 0.85rem;
+      padding: 0.55rem 1.1rem;
+    }
+
+    /* Mobile nav toggle */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    /* ════════════════════════════════════════
+       2. HERO SECTION
+    ════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 7rem 0 4rem;
+    }
+    .hero-bg-glow {
+      position: absolute;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 600px;
+      background: radial-gradient(ellipse at center, rgba(34,197,94,0.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-dot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(34,197,94,0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-content { max-width: 580px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem 0.3rem 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--green);
+      margin-bottom: 1.8rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .hero-badge-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: glowPulse 1.8s ease-in-out infinite;
+    }
+    .hero-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.8rem, 5.5vw, 4.6rem);
+      line-height: 1.05;
+      margin-bottom: 1.4rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .hero-headline .accent { color: var(--green); }
+    .hero-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.8rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .hero-stat { display: flex; flex-direction: column; }
+    .hero-stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--green);
+    }
+    .hero-stat-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .hero-stat-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+    }
+
+    /* Hero Visual Card */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 60px rgba(34,197,94,0.12), 0 24px 64px rgba(0,0,0,0.4);
+      animation: float 4s ease-in-out infinite;
+    }
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+    .hero-card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+    .hero-card-total {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+    .hero-card-total span {
+      color: var(--green);
+      font-weight: 500;
+    }
+    .loan-row {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .loan-row:last-of-type { border-bottom: none; }
+    .loan-row-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    .loan-row-icon.student { background: rgba(34,197,94,0.15); }
+    .loan-row-icon.auto    { background: rgba(245,158,11,0.15); }
+    .loan-row-icon.personal{ background: rgba(139,92,246,0.15); }
+    .loan-row-info { flex: 1; min-width: 0; }
+    .loan-row-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .loan-row-rate {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .loan-row-right { text-align: right; flex-shrink: 0; }
+    .loan-row-balance {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+    .loan-row-progress {
+      margin-top: 0.25rem;
+      height: 3px;
+      background: rgba(34,197,94,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      width: 80px;
+    }
+    .loan-row-bar {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+    }
+    .hero-card-footer {
+      margin-top: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+    }
+    .hero-card-footer-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .hero-card-footer-amount {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.1rem;
+      color: var(--green);
+    }
+
+    /* ════════════════════════════════════════
+       3. STATS BAR
+    ════════════════════════════════════════ */
+    #stats-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+    .stats-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      flex: 1;
+      min-width: 160px;
+      text-align: center;
+      padding: 0.8rem 2rem;
+    }
+    .stat-item + .stat-item {
+      border-left: 1px solid var(--border);
+    }
+    .stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.7rem;
+      font-weight: 500;
+      color: var(--green);
+      display: block;
+    }
+    .stat-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* ════════════════════════════════════════
+       4. FEATURES SECTION
+    ════════════════════════════════════════ */
+    #features {
+      padding: 7rem 0;
+      background: var(--bg);
+    }
+    .features-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      transition: all 0.2s ease;
+    }
+    .feature-card:hover {
+      background: var(--surface2);
+      border-color: rgba(34,197,94,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(34,197,94,0.08);
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.0rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .feature-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ════════════════════════════════════════
+       5. HOW IT WORKS
+    ════════════════════════════════════════ */
+    #how-it-works {
+      background: var(--bg2);
+      padding: 7rem 0;
+    }
+    .hiw-header { text-align: center; margin-bottom: 3.5rem; }
+    .steps-wrapper {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+    }
+    .step {
+      flex: 1;
+      max-width: 280px;
+      text-align: center;
+      padding: 0 1.5rem;
+      position: relative;
+    }
+    .step-connector {
+      flex: 1;
+      max-width: 120px;
+      height: 2px;
+      border-top: 2px dashed rgba(34,197,94,0.3);
+      margin-top: 28px;
+      flex-shrink: 0;
+    }
+    .step-number {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--green-glow);
+      border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--green);
+      margin: 0 auto 1.2rem;
+      box-shadow: 0 0 20px rgba(34,197,94,0.2);
+    }
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+    .step-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ════════════════════════════════════════
+       6. LOAN SIMULATOR
+    ════════════════════════════════════════ */
+    #simulator {
+      padding: 7rem 0;
+      background: var(--bg);
+    }
+    .sim-header { text-align: center; margin-bottom: 3.5rem; }
+    .sim-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .sim-inputs {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .sim-inputs-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .form-field { margin-bottom: 1.4rem; }
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.55rem;
+    }
+    .form-label-val {
+      font-family: 'DM Mono', monospace;
+      color: var(--green);
+    }
+    .form-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--green); }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(34,197,94,0.12);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(34,197,94,0.5);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 10px rgba(34,197,94,0.5);
+    }
+    .sim-output {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .sim-output-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+    .sim-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sim-metric:last-of-type { border-bottom: none; }
+    .sim-metric-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .sim-metric-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    .sim-metric-val.green { color: var(--green); }
+    .sim-metric-val.amber { color: var(--amber); }
+    .sim-metric-val.white { color: var(--text-primary); }
+    .sim-chart-wrap {
+      margin-top: 1.5rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .sim-chart-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    #sim-chart {
+      width: 100%;
+      height: 100px;
+    }
+
+    /* ════════════════════════════════════════
+       7. STUDENT LOAN CALLOUT
+    ════════════════════════════════════════ */
+    #student-focus {
+      padding: 7rem 0;
+      background: var(--bg2);
+    }
+    .student-inner {
+      display: grid;
+      grid-template-columns: 55fr 45fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .student-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      border-radius: 12px;
+      padding: 2.5rem;
+    }
+    .student-content .section-sub {
+      margin-bottom: 1.5rem;
+    }
+    .check-list {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 0.45rem 0;
+    }
+    .check-list li svg { flex-shrink: 0; margin-top: 2px; }
+    .student-link {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: gap 0.2s;
+    }
+    .student-link:hover { gap: 0.55rem; }
+
+    /* Repayment comparison table */
+    .repay-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .repay-table-head {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 0.75rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .repay-th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    .repay-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .repay-row:last-child { border-bottom: none; }
+    .repay-row:hover { background: var(--surface2); }
+    .repay-cell {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+    }
+    .repay-cell.label { color: var(--text-secondary); font-size: 0.78rem; }
+    .repay-cell.highlight { color: var(--green); }
+    .repay-cell.amber { color: var(--amber); }
+
+    /* ════════════════════════════════════════
+       8. MILESTONES
+    ════════════════════════════════════════ */
+    #milestones {
+      padding: 7rem 0;
+      background: var(--bg2);
+    }
+    .milestones-header { text-align: center; margin-bottom: 3.5rem; }
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    .milestone-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .milestone-card.unlocked:hover {
+      background: var(--surface2);
+      border-color: rgba(34,197,94,0.3);
+      transform: translateY(-2px);
+    }
+    .milestone-card.locked {
+      opacity: 0.45;
+    }
+    .milestone-card.locked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(8,15,10,0.15);
+      border-radius: 12px;
+    }
+    .milestone-emoji {
+      font-size: 2.2rem;
+      margin-bottom: 0.9rem;
+      display: block;
+    }
+    .milestone-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+    .milestone-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .milestone-badge {
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 100px;
+    }
+    .milestone-badge.earned {
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      color: var(--green);
+    }
+    .milestone-badge.locked-badge {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-muted);
+    }
+    .lock-icon {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      z-index: 2;
+      color: var(--text-muted);
+    }
+
+    /* ════════════════════════════════════════
+       9. TESTIMONIALS
+    ════════════════════════════════════════ */
+    #testimonials {
+      padding: 7rem 0;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .testi-bg-quote {
+      position: absolute;
+      top: 2rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 22rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: rgba(34,197,94,0.025);
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+    }
+    .testi-header { text-align: center; margin-bottom: 3.5rem; position: relative; z-index: 1; }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .testi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      transition: all 0.2s ease;
+    }
+    .testi-card:hover {
+      background: var(--surface2);
+      border-color: rgba(34,197,94,0.25);
+      transform: translateY(-2px);
+    }
+    .testi-stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 1rem;
+    }
+    .testi-stars svg { width: 14px; height: 14px; fill: var(--green); }
+    .testi-quote {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.3rem;
+    }
+    .testi-author { display: flex; align-items: center; gap: 0.8rem; }
+    .testi-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--green);
+      flex-shrink: 0;
+    }
+    .testi-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+    .testi-role {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ════════════════════════════════════════
+       10. CTA BANNER
+    ════════════════════════════════════════ */
+    #cta-banner {
+      padding: 7rem 0;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse at center, rgba(34,197,94,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cta-inner {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+      line-height: 1.15;
+    }
+    .cta-btn {
+      font-size: 1.05rem;
+      padding: 1rem 2.4rem;
+      border-radius: 10px;
+      margin-bottom: 1.2rem;
+    }
+    .cta-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ════════════════════════════════════════
+       11. FOOTER
+    ════════════════════════════════════════ */
+    #footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 4rem 0 0;
+    }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    .footer-brand-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin: 1rem 0 1.4rem;
+      max-width: 240px;
+    }
+    .footer-socials { display: flex; gap: 0.75rem; }
+    .social-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .social-icon:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+    .social-icon svg { width: 16px; height: 16px; }
+    .footer-col-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      margin-bottom: 1.1rem;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li + li { margin-top: 0.7rem; }
+    .footer-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--green); }
+    .footer-newsletter-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.9rem;
+    }
+    .footer-email-input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.6rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .footer-email-input:focus { border-color: var(--green); }
+    .footer-email-input::placeholder { color: var(--text-muted); }
+    .footer-sub-btn {
+      background: var(--green);
+      color: #080F0A;
+      border: none;
+      border-radius: 7px;
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .footer-sub-btn:hover { background: #28d968; }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding: 1.4rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .footer-copy {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .hackathon-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--green);
+    }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    /* ════════════════════════════════════════
+       EDUCATION HUB SECTION
+    ════════════════════════════════════════ */
+    #edu-hub {
+      padding: 7rem 0;
+      background: var(--bg2);
+    }
+    .edu-hub-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .edu-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+    .edu-hub-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .edu-hub-card:hover {
+      background: var(--surface2);
+      border-color: rgba(34,197,94,0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(34,197,94,0.08);
+    }
+    .edu-hub-icon {
+      width: 44px; height: 44px;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.1rem;
+    }
+    .edu-hub-icon svg { width: 22px; height: 22px; }
+    .edu-hub-card-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    .edu-hub-card-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.87rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 1.1rem;
+    }
+    .edu-hub-link {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: gap 0.2s;
+    }
+    .edu-hub-link:hover { gap: 0.55rem; }
+    .edu-hub-cta {
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid,
+      .milestones-grid,
+      .testi-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-main { grid-template-columns: 1fr 1fr; }
+      .student-inner { grid-template-columns: 1fr; }
+      .edu-hub-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links, .nav-actions { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .hero-headline { font-size: 2.6rem; }
+      .sim-inner { grid-template-columns: 1fr; }
+      .steps-wrapper { flex-direction: column; align-items: center; }
+      .step-connector { width: 2px; height: 40px; border-top: none; border-left: 2px dashed rgba(34,197,94,0.3); margin-top: 0; }
+      .features-grid,
+      .milestones-grid,
+      .testi-grid,
+      .edu-hub-grid { grid-template-columns: 1fr; }
+      .footer-main { grid-template-columns: 1fr; }
+      .stats-bar-inner { flex-direction: column; }
+      .stat-item + .stat-item { border-left: none; border-top: 1px solid var(--border); }
+    }
+
+    /* ── THEME TOGGLE BUTTON ── */
+    .theme-toggle {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+    /* ── LIGHT MODE OVERRIDES ── */
+    body.light-mode {
+      --bg:             #F4F9F4;
+      --bg2:            #EBF5EB;
+      --surface:        #FFFFFF;
+      --surface2:       #E8F5E8;
+      --border:         rgba(22,163,74,0.2);
+      --green:          #16A34A;
+      --green-dim:      #15803D;
+      --green-glow:     rgba(22,163,74,0.12);
+      --panel-border:   rgba(22,163,74,0.2);
+      --text-primary:   #0F1F0F;
+      --text-secondary: #166534;
+      --text-muted:     rgba(22,101,52,0.6);
+      --amber:          #B45309;
+    }
+    body.light-mode { background: var(--bg); color: var(--text-primary); }
+
+    body.light-mode nav,
+    body.light-mode #topbar,
+    body.light-mode .navbar { background: rgba(244,249,244,0.95) !important; border-bottom-color: rgba(22,163,74,0.15) !important; }
+
+    body.light-mode #sidebar,
+    body.light-mode .sidebar { background: #EBF5EB !important; border-right-color: rgba(22,163,74,0.15) !important; }
+
+    body.light-mode .panel,
+    body.light-mode .panel-card,
+    body.light-mode .stat-card { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    body.light-mode input,
+    body.light-mode select,
+    body.light-mode textarea {
+      background: #FFFFFF !important;
+      color: #0F1F0F !important;
+      border-color: rgba(22,163,74,0.3) !important;
+    }
+    body.light-mode input::placeholder { color: rgba(22,101,52,0.4) !important; }
+
+    body.light-mode #ticker { background: #EBF5EB !important; border-top-color: rgba(22,163,74,0.2) !important; }
+
+    body.light-mode .btn-ghost,
+    body.light-mode .nav-signin { color: var(--text-primary) !important; }
+
+    body.light-mode .auth-panel { background: #FFFFFF !important; }
+    body.light-mode .brand-panel { background: linear-gradient(135deg, #E8F5E8, #D1FAD1) !important; }
+
+    body.light-mode #navbar.scrolled { background: rgba(244,249,244,0.95) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       1. NAVBAR
+  ═══════════════════════════════════════ -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="LifeLaunch Loans home">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M9 2L11.5 7H16L12 10.5L13.5 15.5L9 12.5L4.5 15.5L6 10.5L2 7H6.5L9 2Z" fill="#080F0A"/>
+          </svg>
+        </div>
+        <span class="nav-logo-text">
+          <span class="bold">LifeLaunch</span><span class="light">Loans</span>
+        </span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#student-focus">For Students</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li><a href="#simulator">Pricing</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="signin.html" class="nav-signin">Sign In</a>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+        <a href="signin.html" class="btn-green nav-cta">Get Early Access</a>
+      </div>
+
+      <button class="nav-hamburger" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" style="display:none; padding: 1rem 2rem 1.5rem; background: rgba(8,15,10,0.95); border-top: 1px solid var(--border);">
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:0.9rem; margin-bottom:1.2rem;">
+        <li><a href="#features" style="color:var(--text-secondary); font-size:0.95rem;" onclick="closeMobileMenu()">Features</a></li>
+        <li><a href="#how-it-works" style="color:var(--text-secondary); font-size:0.95rem;" onclick="closeMobileMenu()">How It Works</a></li>
+        <li><a href="#student-focus" style="color:var(--text-secondary); font-size:0.95rem;" onclick="closeMobileMenu()">For Students</a></li>
+        <li><a href="education.html" style="color:var(--text-secondary); font-size:0.95rem;" onclick="closeMobileMenu()">Education</a></li>
+        <li><a href="#simulator" style="color:var(--text-secondary); font-size:0.95rem;" onclick="closeMobileMenu()">Pricing</a></li>
+      </ul>
+      <div style="display:flex; gap:0.75rem;">
+        <a href="signin.html" class="btn-ghost" style="flex:1; text-align:center;">Sign In</a>
+        <a href="signin.html" class="btn-green" style="flex:1; text-align:center;">Get Early Access</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════
+       2. HERO SECTION
+  ═══════════════════════════════════════ -->
+  <section id="hero" aria-labelledby="hero-headline">
+    <div class="hero-bg-glow" aria-hidden="true"></div>
+    <div class="hero-dot-grid" aria-hidden="true"></div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <div class="hero-badge-dot"></div>
+          Now in beta — early access open
+        </div>
+        <h1 class="hero-headline" id="hero-headline">
+          Borrow Smart.<br><span class="accent">Launch</span> Far.
+        </h1>
+        <p class="hero-sub">
+          The financial co-pilot for students and young adults navigating loans, repayment, and life after school.
+        </p>
+        <div class="hero-ctas">
+          <a href="signin.html" class="btn-green">Calculate My Loans</a>
+          <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+        </div>
+        <div class="hero-stats" role="list" aria-label="Trust statistics">
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-num">$2.4M</span>
+            <span class="hero-stat-label">saved by users</span>
+          </div>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-num">12,000+</span>
+            <span class="hero-stat-label">plans created</span>
+          </div>
+          <div class="hero-stat-divider" aria-hidden="true"></div>
+          <div class="hero-stat" role="listitem">
+            <span class="hero-stat-num">4.9&#9733;</span>
+            <span class="hero-stat-label">avg rating</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero floating card -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span class="hero-card-title">My Loans — Alex Rivera</span>
+            <span class="hero-card-total">Total <span>$47,100</span></span>
+          </div>
+
+          <div class="loan-row">
+            <div class="loan-row-icon student">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div class="loan-row-info">
+              <div class="loan-row-label">Federal Student Loan</div>
+              <div class="loan-row-rate">5.5% APR · 120 mo</div>
+            </div>
+            <div class="loan-row-right">
+              <div class="loan-row-balance">$34,200</div>
+              <div class="loan-row-progress"><div class="loan-row-bar" style="width:90%;"></div></div>
+            </div>
+          </div>
+
+          <div class="loan-row">
+            <div class="loan-row-icon auto">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="loan-row-info">
+              <div class="loan-row-label">Car Loan</div>
+              <div class="loan-row-rate">8.9% APR · 60 mo</div>
+            </div>
+            <div class="loan-row-right">
+              <div class="loan-row-balance">$9,800</div>
+              <div class="loan-row-progress"><div class="loan-row-bar" style="width:82%; background:#F59E0B;"></div></div>
+            </div>
+          </div>
+
+          <div class="loan-row">
+            <div class="loan-row-icon personal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="loan-row-info">
+              <div class="loan-row-label">Personal Loan</div>
+              <div class="loan-row-rate">11.2% APR · 36 mo</div>
+            </div>
+            <div class="loan-row-right">
+              <div class="loan-row-balance">$3,100</div>
+              <div class="loan-row-progress"><div class="loan-row-bar" style="width:62%; background:#8B5CF6;"></div></div>
+            </div>
+          </div>
+
+          <div class="hero-card-footer">
+            <span class="hero-card-footer-label">Next payment due Feb 1</span>
+            <span class="hero-card-footer-amount">$487.32/mo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       3. STATS BAR
+  ═══════════════════════════════════════ -->
+  <section id="stats-bar" aria-label="Key statistics">
+    <div class="stats-bar-inner reveal">
+      <div class="stat-item">
+        <span class="stat-num">$37,338</span>
+        <div class="stat-label">avg student debt in the US</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">68%</span>
+        <div class="stat-label">of users paid off early</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">$4,200</span>
+        <div class="stat-label">avg interest saved</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">2.3 yrs</span>
+        <div class="stat-label">to first loan payoff</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       4. FEATURES SECTION
+  ═══════════════════════════════════════ -->
+  <section id="features" aria-labelledby="features-headline">
+    <div class="container">
+      <div class="features-header reveal">
+        <div class="chip">WHAT WE DO</div>
+        <h2 class="section-headline" id="features-headline">Everything you need to own your debt.</h2>
+        <p class="section-sub" style="margin:0 auto;">Six tools designed from the ground up for the generation carrying the heaviest debt load in history.</p>
+      </div>
+      <div class="features-grid">
+
+        <!-- Card 1 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="feature-title">Personal Loan Planner</div>
+          <p class="feature-desc">Map out every loan in one place. See balances, rates, and payoff timelines on a single clean dashboard.</p>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="feature-title">Student Loan Focus</div>
+          <p class="feature-desc">Purpose-built for federal and private student debt. Navigate IDR, PSLF, and forgiveness pathways with confidence.</p>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="feature-title">Life-Start Guidance</div>
+          <p class="feature-desc">From your first apartment to your first 401(k) — context-aware guidance for every milestone in your post-grad life.</p>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+          <div class="feature-title">Smarter Repayment</div>
+          <p class="feature-desc">Avalanche or snowball? We run the numbers both ways and show you exactly how much you'll save with each strategy.</p>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="feature-title">Financial Literacy</div>
+          <p class="feature-desc">Bite-sized lessons embedded in your dashboard. Learn interest math, credit scores, and investing basics at your own pace.</p>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="feature-card reveal">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <div class="feature-title">Unified Dashboard</div>
+          <p class="feature-desc">All your loans, payments, and progress in one elegant view. Clean rows, green numbers, and zero noise.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       4b. EDUCATION HUB
+  ═══════════════════════════════════════ -->
+  <section id="edu-hub" aria-labelledby="edu-hub-headline">
+    <div class="container">
+      <div class="edu-hub-header reveal">
+        <div class="chip">FREE RESOURCES</div>
+        <h2 class="section-headline" id="edu-hub-headline">Learn before you borrow.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Most young adults sign loan documents they don't understand. We're changing that.</p>
+      </div>
+
+      <div class="edu-hub-grid">
+
+        <article class="edu-hub-card reveal">
+          <div class="edu-hub-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="edu-hub-card-title">Understand Your Rates</div>
+          <p class="edu-hub-card-desc">APR and interest rate aren't the same thing — and the difference can add thousands to your total cost.</p>
+          <a href="education.html" class="edu-hub-link">
+            Read Guide
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </article>
+
+        <article class="edu-hub-card reveal">
+          <div class="edu-hub-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="edu-hub-card-title">Federal vs Private</div>
+          <p class="edu-hub-card-desc">The loan type you choose shapes your entire repayment journey — income-driven plans and forgiveness are federal-only.</p>
+          <a href="education.html" class="edu-hub-link">
+            Read Guide
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </article>
+
+        <article class="edu-hub-card reveal">
+          <div class="edu-hub-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+            </svg>
+          </div>
+          <div class="edu-hub-card-title">Repayment Strategies</div>
+          <p class="edu-hub-card-desc">Avalanche, snowball, or standard — see which strategy saves the most money with a real $50,000 example.</p>
+          <a href="education.html" class="edu-hub-link">
+            Read Guide
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </article>
+
+      </div>
+
+      <div class="edu-hub-cta reveal">
+        <a href="education.html" class="btn-green" style="font-size:1rem; padding:0.85rem 2rem;">Visit the Education Hub &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       5. HOW IT WORKS
+  ═══════════════════════════════════════ -->
+  <section id="how-it-works" aria-labelledby="hiw-headline">
+    <div class="container">
+      <div class="hiw-header reveal">
+        <div class="chip">HOW IT WORKS</div>
+        <h2 class="section-headline" id="hiw-headline">Three steps to financial clarity.</h2>
+        <p class="section-sub" style="margin: 0 auto;">No spreadsheets. No confusing jargon. Just a clear path from where you are to where you want to be.</p>
+      </div>
+      <div class="steps-wrapper reveal">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div class="step-title">Add Your Loans</div>
+          <p class="step-desc">Enter your loan amounts, interest rates, and terms. Or connect your servicer directly — we'll pull everything automatically.</p>
+        </div>
+        <div class="step-connector" aria-hidden="true"></div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <div class="step-title">See Your Roadmap</div>
+          <p class="step-desc">We model every repayment strategy and project your payoff date, total interest, and monthly payment across multiple scenarios.</p>
+        </div>
+        <div class="step-connector" aria-hidden="true"></div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <div class="step-title">Take Action</div>
+          <p class="step-desc">Pick your plan, set a payment schedule, and track milestones as you systematically eliminate your debt and build your future.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       6. LOAN SIMULATOR PREVIEW
+  ═══════════════════════════════════════ -->
+  <section id="simulator" aria-labelledby="sim-headline">
+    <div class="container">
+      <div class="sim-header reveal">
+        <div class="chip">TRY IT</div>
+        <h2 class="section-headline" id="sim-headline">See what you could save.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Adjust the sliders and watch your loan trajectory update in real time.</p>
+      </div>
+      <div class="sim-inner reveal">
+        <div class="sim-inputs">
+          <div class="sim-inputs-title">Loan Parameters</div>
+
+          <div class="form-field">
+            <label class="form-label" for="sim-amount">
+              Loan Amount
+              <span class="form-label-val" id="sim-amount-display">$38,000</span>
+            </label>
+            <input class="form-input" type="number" id="sim-amount" value="38000" min="1000" max="200000" step="500" aria-label="Loan amount in dollars" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="sim-rate">
+              Annual Interest Rate
+              <span class="form-label-val" id="sim-rate-display">5.50%</span>
+            </label>
+            <input class="form-input" type="number" id="sim-rate" value="5.5" min="0.1" max="30" step="0.1" aria-label="Annual interest rate percentage" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="sim-term">
+              Loan Term
+              <span class="form-label-val" id="sim-term-display">120 months (10 yr)</span>
+            </label>
+            <input type="range" id="sim-term" min="12" max="120" step="6" value="120" aria-label="Loan term in months" />
+          </div>
+        </div>
+
+        <div class="sim-output">
+          <div class="sim-output-title">Your Projections</div>
+
+          <div class="sim-metric">
+            <span class="sim-metric-label">Monthly Payment</span>
+            <span class="sim-metric-val green" id="sim-monthly">—</span>
+          </div>
+          <div class="sim-metric">
+            <span class="sim-metric-label">Total Interest Paid</span>
+            <span class="sim-metric-val amber" id="sim-interest">—</span>
+          </div>
+          <div class="sim-metric">
+            <span class="sim-metric-label">Total Cost</span>
+            <span class="sim-metric-val white" id="sim-total">—</span>
+          </div>
+
+          <div class="sim-chart-wrap">
+            <div class="sim-chart-label">Balance over time</div>
+            <svg id="sim-chart" viewBox="0 0 400 100" preserveAspectRatio="none" aria-label="Loan balance decline chart" role="img">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(34,197,94,0.25)"/>
+                  <stop offset="100%" stop-color="rgba(34,197,94,0)"/>
+                </linearGradient>
+              </defs>
+              <path id="chart-area" fill="url(#chartGrad)" />
+              <path id="chart-line" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:2rem;">
+        <a href="signin.html" style="
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          color: var(--green);
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 500;
+          background: var(--green-glow);
+          border: 1px solid var(--border);
+          border-radius: 100px;
+          padding: 0.55rem 1.3rem;
+          transition: all 0.2s;
+          text-decoration: none;
+        "
+        onmouseover="this.style.background='rgba(34,197,94,0.22)'; this.style.borderColor='rgba(34,197,94,0.35)';"
+        onmouseout="this.style.background='var(--green-glow)'; this.style.borderColor='var(--border)';"
+        >
+          Create Free Account to Save Your Results &#8594;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       7. STUDENT LOAN FOCUS CALLOUT
+  ═══════════════════════════════════════ -->
+  <section id="student-focus" aria-labelledby="student-headline">
+    <div class="container student-inner">
+      <div class="student-content reveal">
+        <div class="chip">FOR STUDENTS</div>
+        <h2 class="section-headline" id="student-headline">Built for the student loan crisis.</h2>
+        <p class="section-sub">$1.7 trillion in student debt. 43 million borrowers. One tool designed specifically for you.</p>
+        <ul class="check-list" role="list">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Navigate IBR, SAVE, PAYE, and PSLF with side-by-side plan comparisons
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Model the impact of extra payments on your total interest and payoff date
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Track grace periods, deferment windows, and servicer deadlines in one place
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Get alerts before capitalization events that could inflate your balance
+          </li>
+        </ul>
+        <a href="#" class="student-link">
+          Explore Student Loan Tools
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <div class="reveal">
+        <div class="repay-table" role="table" aria-label="Repayment plan comparison">
+          <div class="repay-table-head" role="row">
+            <span class="repay-th" role="columnheader">Plan</span>
+            <span class="repay-th" role="columnheader">Mo. Payment</span>
+            <span class="repay-th" role="columnheader">Total Cost</span>
+            <span class="repay-th" role="columnheader">Payoff</span>
+          </div>
+          <div class="repay-row" role="row">
+            <span class="repay-cell label" role="cell">Standard</span>
+            <span class="repay-cell" role="cell">$412</span>
+            <span class="repay-cell amber" role="cell">$49,420</span>
+            <span class="repay-cell" role="cell">10 yr</span>
+          </div>
+          <div class="repay-row" role="row">
+            <span class="repay-cell label" role="cell">IBR</span>
+            <span class="repay-cell highlight" role="cell">$218</span>
+            <span class="repay-cell amber" role="cell">$64,800</span>
+            <span class="repay-cell" role="cell">20 yr</span>
+          </div>
+          <div class="repay-row" role="row">
+            <span class="repay-cell label" role="cell">PSLF</span>
+            <span class="repay-cell highlight" role="cell">$218</span>
+            <span class="repay-cell highlight" role="cell">$26,160</span>
+            <span class="repay-cell" role="cell">10 yr*</span>
+          </div>
+          <div style="padding: 0.65rem 1.2rem; background: var(--surface2);">
+            <span style="font-family:'DM Sans',sans-serif; font-size:0.7rem; color:var(--text-muted);">* PSLF requires qualifying employment. Results illustrative only.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       8. MILESTONES & GAMIFICATION
+  ═══════════════════════════════════════ -->
+  <section id="milestones" aria-labelledby="milestones-headline">
+    <div class="container">
+      <div class="milestones-header reveal">
+        <div class="chip">MILESTONES</div>
+        <h2 class="section-headline" id="milestones-headline">Financial wins worth celebrating.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Every step forward deserves recognition. Unlock badges as you crush your debt.</p>
+      </div>
+      <div class="milestones-grid">
+
+        <article class="milestone-card unlocked reveal" aria-label="First Loan Added milestone — earned">
+          <span class="milestone-emoji" aria-hidden="true">🎯</span>
+          <div class="milestone-title">First Loan Added</div>
+          <p class="milestone-desc">You took the first step. Your journey starts with clarity.</p>
+          <span class="milestone-badge earned">EARNED</span>
+        </article>
+
+        <article class="milestone-card unlocked reveal" aria-label="First Payment Made milestone — earned">
+          <span class="milestone-emoji" aria-hidden="true">💸</span>
+          <div class="milestone-title">First Payment Made</div>
+          <p class="milestone-desc">Money out the door and working for you. Momentum is everything.</p>
+          <span class="milestone-badge earned">EARNED</span>
+        </article>
+
+        <article class="milestone-card unlocked reveal" aria-label="3-Month Streak milestone — earned">
+          <span class="milestone-emoji" aria-hidden="true">🔥</span>
+          <div class="milestone-title">3-Month Streak</div>
+          <p class="milestone-desc">Three months of on-time payments. Consistency is your superpower.</p>
+          <span class="milestone-badge earned">EARNED</span>
+        </article>
+
+        <article class="milestone-card locked reveal" aria-label="25% Paid Off milestone — locked">
+          <svg class="lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="milestone-emoji" aria-hidden="true">📉</span>
+          <div class="milestone-title">25% Paid Off</div>
+          <p class="milestone-desc">A quarter of the mountain climbed. The view only gets better.</p>
+          <span class="milestone-badge locked-badge">LOCKED</span>
+        </article>
+
+        <article class="milestone-card locked reveal" aria-label="Avalanche Activated milestone — locked">
+          <svg class="lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="milestone-emoji" aria-hidden="true">⚡</span>
+          <div class="milestone-title">Avalanche Activated</div>
+          <p class="milestone-desc">You switched to the debt avalanche method. Interest doesn't stand a chance.</p>
+          <span class="milestone-badge locked-badge">LOCKED</span>
+        </article>
+
+        <article class="milestone-card locked reveal" aria-label="Loan-Free milestone — locked">
+          <svg class="lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="milestone-emoji" aria-hidden="true">🏆</span>
+          <div class="milestone-title">Loan-Free</div>
+          <p class="milestone-desc">Zero. Paid in full. You did the thing. This one changes everything.</p>
+          <span class="milestone-badge locked-badge">LOCKED</span>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       9. TESTIMONIALS
+  ═══════════════════════════════════════ -->
+  <section id="testimonials" aria-labelledby="testi-headline">
+    <div class="testi-bg-quote" aria-hidden="true">"</div>
+    <div class="container">
+      <div class="testi-header reveal">
+        <div class="chip">WHAT USERS SAY</div>
+        <h2 class="section-headline" id="testi-headline">Real people. Real payoff stories.</h2>
+      </div>
+      <div class="testi-grid">
+
+        <article class="testi-card reveal">
+          <div class="testi-stars" aria-label="5 stars">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <blockquote class="testi-quote">"I never understood why my student loan balance barely moved. LifeLaunch showed me exactly how interest was eating my payments — and how one small change could save me $3,800."</blockquote>
+          <div class="testi-author">
+            <div class="testi-avatar" aria-hidden="true">MK</div>
+            <div>
+              <div class="testi-name">Maya Kim</div>
+              <div class="testi-role">Nursing Graduate, 2023</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testi-card reveal">
+          <div class="testi-stars" aria-label="5 stars">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <blockquote class="testi-quote">"The simulator alone is worth it. I played around for 20 minutes and figured out that adding $75/month knocks 2.5 years off my loan. That's life-changing information I just didn't have before."</blockquote>
+          <div class="testi-author">
+            <div class="testi-avatar" aria-hidden="true">DT</div>
+            <div>
+              <div class="testi-name">Daniel Torres</div>
+              <div class="testi-role">Software Engineer, Entry Level</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testi-card reveal">
+          <div class="testi-stars" aria-label="5 stars">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <blockquote class="testi-quote">"As a first-gen college grad, nobody taught me about loan repayment plans. LifeLaunch laid it all out clearly. I found out I qualify for PSLF and could save over $20K. I'm genuinely emotional about this app."</blockquote>
+          <div class="testi-author">
+            <div class="testi-avatar" aria-hidden="true">JO</div>
+            <div>
+              <div class="testi-name">Jasmine Okafor</div>
+              <div class="testi-role">Public School Teacher</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       10. CTA BANNER
+  ═══════════════════════════════════════ -->
+  <section id="cta-banner" aria-labelledby="cta-headline">
+    <div class="cta-glow" aria-hidden="true"></div>
+    <div class="container cta-inner reveal">
+      <h2 class="cta-headline" id="cta-headline">Your financial launch<br>starts now.</h2>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.9rem;">
+        <a href="signin.html" class="btn-green cta-btn">Get Early Access — It's Free</a>
+        <p class="cta-sub">No credit card required &nbsp;&middot;&nbsp; Takes 2 minutes &nbsp;&middot;&nbsp; Cancel anytime</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       11. FOOTER
+  ═══════════════════════════════════════ -->
+  <footer id="footer" aria-label="Site footer">
+    <div class="container">
+      <div class="footer-main">
+
+        <!-- Brand column -->
+        <div>
+          <a href="#" class="nav-logo" aria-label="LifeLaunch Loans home" style="display:inline-flex; margin-bottom:0;">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 2L11.5 7H16L12 10.5L13.5 15.5L9 12.5L4.5 15.5L6 10.5L2 7H6.5L9 2Z" fill="#080F0A"/>
+              </svg>
+            </div>
+            <span class="nav-logo-text">
+              <span class="bold">LifeLaunch</span><span class="light">Loans</span>
+            </span>
+          </a>
+          <p class="footer-brand-desc">The financial co-pilot for students and young adults navigating loans, repayment, and life after school.</p>
+          <nav class="footer-socials" aria-label="Social media links">
+            <!-- Twitter/X -->
+            <a href="#" class="social-icon" aria-label="Follow us on X (Twitter)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg>
+            </a>
+            <!-- LinkedIn -->
+            <a href="#" class="social-icon" aria-label="Connect on LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <!-- GitHub -->
+            <a href="#" class="social-icon" aria-label="View on GitHub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <div class="footer-col-title">Product</div>
+          <ul class="footer-links">
+            <li><a href="#">Loan Dashboard</a></li>
+            <li><a href="#">Loan Simulator</a></li>
+            <li><a href="#">Student Loans</a></li>
+            <li><a href="#">Repayment Plans</a></li>
+            <li><a href="#">Milestones</a></li>
+            <li><a href="#">Pricing</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <div class="footer-col-title">Company</div>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Partners</a></li>
+          </ul>
+        </div>
+
+        <!-- Support + Newsletter -->
+        <div>
+          <div class="footer-col-title">Support</div>
+          <ul class="footer-links" style="margin-bottom:1.6rem;">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+          <div class="footer-col-title" style="margin-top:1rem;">Stay Updated</div>
+          <p style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.7rem;">Get tips, updates, and financial insights.</p>
+          <form class="footer-newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+            <input type="email" class="footer-email-input" placeholder="your@email.com" aria-label="Email address for newsletter" required />
+            <button type="submit" class="footer-sub-btn">Subscribe</button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Footer bottom bar -->
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 LifeLaunch Loans, Inc. All rights reserved.</p>
+        <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+          <a href="#" style="font-family:'DM Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+          <a href="#" style="font-family:'DM Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+          <a href="#" style="font-family:'DM Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">Cookies</a>
+          <div class="hackathon-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--green)" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Built at Hackathon 2026
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════ -->
+  <script>
+    /* ── THEME TOGGLE ── */
+    (function() {
+      const saved = (() => { try { return localStorage.getItem('ll_theme'); } catch(e) { return null; } })();
+      if (saved === 'light') document.body.classList.add('light-mode');
+    })();
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-mode');
+      try { localStorage.setItem('ll_theme', isLight ? 'light' : 'dark'); } catch(e) {}
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const isLight = document.body.classList.contains('light-mode');
+      document.querySelectorAll('.theme-toggle').forEach(btn => {
+        btn.innerHTML = isLight
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+      });
+    }
+    document.addEventListener('DOMContentLoaded', updateThemeIcon);
+
+    /* ─── Mock Data ─── */
+    const mockData = {
+      user: { name: "Alex Rivera", role: "Recent Graduate" },
+      loans: [
+        { id: "loan_1", type: "student",  label: "Federal Student Loan", principal: 38000, rate: 5.5,  termMonths: 120, balance: 34200 },
+        { id: "loan_2", type: "auto",     label: "Car Loan",             principal: 12000, rate: 8.9,  termMonths: 60,  balance: 9800 },
+        { id: "loan_3", type: "personal", label: "Personal Loan",        principal: 5000,  rate: 11.2, termMonths: 36,  balance: 3100 }
+      ],
+      monthlyPayment: 487.32,
+      totalDebt: 47100,
+      totalInterest: 9204.18,
+      nextPaymentDue: "2025-02-01"
+    };
+
+    /* ─── Navbar scroll effect ─── */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }, { passive: true });
+
+    /* ─── Mobile menu ─── */
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobile-menu').style.display = 'none';
+    }
+
+    /* ─── Intersection Observer scroll reveal ─── */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger children in grids
+          const delay = entry.target.closest('.features-grid, .milestones-grid, .testi-grid, .steps-wrapper')
+            ? Array.from(entry.target.parentElement.children).indexOf(entry.target) * 80
+            : 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ─── Loan Simulator ─── */
+    const simAmount  = document.getElementById('sim-amount');
+    const simRate    = document.getElementById('sim-rate');
+    const simTerm    = document.getElementById('sim-term');
+    const simAmountDisplay = document.getElementById('sim-amount-display');
+    const simRateDisplay   = document.getElementById('sim-rate-display');
+    const simTermDisplay   = document.getElementById('sim-term-display');
+    const simMonthly = document.getElementById('sim-monthly');
+    const simInterest = document.getElementById('sim-interest');
+    const simTotal   = document.getElementById('sim-total');
+    const chartLine  = document.getElementById('chart-line');
+    const chartArea  = document.getElementById('chart-area');
+
+    function formatCurrency(n) {
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calcMonthly(P, annualRate, months) {
+      if (annualRate === 0) return P / months;
+      const r = annualRate / 12 / 100;
+      return P * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+    }
+
+    function buildChartPath(P, annualRate, months) {
+      const r = annualRate / 12 / 100;
+      const M = calcMonthly(P, annualRate, months);
+      const points = [];
+      let balance = P;
+      const W = 400;
+      const H = 100;
+      const pad = 6;
+
+      for (let i = 0; i <= months; i++) {
+        const x = pad + (i / months) * (W - pad * 2);
+        const y = H - pad - ((balance / P) * (H - pad * 2));
+        points.push([x, y]);
+        if (annualRate === 0) {
+          balance -= M;
+        } else {
+          const interest = balance * r;
+          const principal = M - interest;
+          balance -= principal;
+        }
+        if (balance < 0) balance = 0;
+      }
+
+      if (points.length === 0) return { line: '', area: '' };
+      const lineD = points.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+      const lastX = points[points.length - 1][0];
+      const areaD = lineD + ` L${lastX},${H - pad} L${pad},${H - pad} Z`;
+
+      return { line: lineD, area: areaD };
+    }
+
+    function updateSimulator() {
+      const P = parseFloat(simAmount.value) || 0;
+      const rate = parseFloat(simRate.value) || 0;
+      const months = parseInt(simTerm.value) || 12;
+
+      // Update display labels
+      simAmountDisplay.textContent = '$' + P.toLocaleString('en-US');
+      simRateDisplay.textContent   = rate.toFixed(2) + '%';
+      const years = Math.floor(months / 12);
+      const remMonths = months % 12;
+      const termStr = years > 0
+        ? (remMonths > 0 ? `${months} months (${years} yr ${remMonths} mo)` : `${months} months (${years} yr)`)
+        : `${months} months`;
+      simTermDisplay.textContent = termStr;
+
+      // Calculate
+      const M = calcMonthly(P, rate, months);
+      const totalCost = M * months;
+      const totalInterest = totalCost - P;
+
+      simMonthly.textContent  = formatCurrency(M);
+      simInterest.textContent = formatCurrency(Math.max(0, totalInterest));
+      simTotal.textContent    = formatCurrency(totalCost);
+
+      // Chart
+      const paths = buildChartPath(P, rate, months);
+      chartLine.setAttribute('d', paths.line);
+      chartArea.setAttribute('d', paths.area);
+    }
+
+    simAmount.addEventListener('input', updateSimulator);
+    simRate.addEventListener('input', updateSimulator);
+    simTerm.addEventListener('input', updateSimulator);
+
+    // Init
+    updateSimulator();
+
+    /* ─── Newsletter form ─── */
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      const input = e.target.querySelector('input');
+      btn.textContent = 'Subscribed!';
+      btn.style.background = 'var(--green-dim)';
+      input.value = '';
+      setTimeout(() => {
+        btn.textContent = 'Subscribe';
+        btn.style.background = '';
+      }, 3000);
+    }
+
+    /* ─── Smooth scroll for nav links ─── */
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const id = link.getAttribute('href');
+        if (id === '#') return;
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

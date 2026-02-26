@@ -1,0 +1,3907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LifeLaunch Loans — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #080F0A;
+    --bg2: #0D1A10;
+    --surface: #0F1F13;
+    --surface2: #162A1A;
+    --border: rgba(34,197,94,0.12);
+    --green: #22C55E;
+    --green-dim: #16A34A;
+    --green-glow: rgba(34,197,94,0.15);
+    --text-primary: #F0FDF4;
+    --text-secondary: #86EFAC;
+    --text-muted: rgba(74,222,128,0.4);
+    --amber: #F59E0B;
+    --sidebar-w: 240px;
+    --sidebar-collapsed: 60px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* ─── Layout Shell ─── */
+  .app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease, min-width 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+    min-width: var(--sidebar-collapsed);
+  }
+
+  .sidebar-logo {
+    padding: 20px 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dim) 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: #000;
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar.collapsed .logo-text { opacity: 0; pointer-events: none; }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 4px 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.15s, color 0.15s, border-left 0.15s;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+    user-select: none;
+  }
+
+  .nav-item:hover {
+    background: var(--surface2);
+    color: var(--text-primary);
+  }
+
+  .nav-item.active {
+    background: var(--surface2);
+    color: var(--green);
+    border-left-color: var(--green);
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
+
+  .sidebar-footer {
+    padding: 12px 8px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .sb-divider { height: 1px; background: var(--border); margin: 6px 8px; }
+
+  .upgrade-card { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 10px 12px; margin: 8px; }
+  .sidebar.collapsed .upgrade-card { display: none; }
+
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-dim) 0%, #0a2e12 100%);
+    border: 1.5px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    flex: 1;
+    min-width: 0;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar.collapsed .user-info { opacity: 0; pointer-events: none; }
+
+  .user-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-role {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .upgrade-badge {
+    background: linear-gradient(90deg, var(--amber) 0%, #D97706 100%);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar.collapsed .upgrade-badge { opacity: 0; pointer-events: none; }
+
+  .collapse-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 10px 2px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.15s;
+    border: none;
+    background: none;
+  }
+
+  .collapse-btn:hover { color: var(--green); }
+
+  .collapse-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.collapsed .collapse-icon { transform: rotate(180deg); }
+
+  /* ─── Main Content ─── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* ─── Top Bar ─── */
+  .topbar {
+    padding: 18px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .welcome-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .welcome-text p {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bell-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    position: relative;
+  }
+
+  .bell-btn:hover { background: var(--surface2); border-color: var(--green); color: var(--green); }
+
+  .bell-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    border: 1.5px solid var(--bg);
+  }
+
+  .advanced-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--green);
+    background: transparent;
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .advanced-btn:hover { background: var(--green-glow); }
+
+  /* ─── Scrollable View Area ─── */
+  .view-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 28px;
+    scroll-behavior: smooth;
+  }
+
+  /* ─── View Sections ─── */
+  .view {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .view.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Cards ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  /* ─── Summary Cards Row ─── */
+  .summary-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .stat-card.stat-primary { border-left: 3px solid var(--green); background: rgba(34,197,94,0.04); }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--green); line-height: 1; }
+  .stat-card.stat-primary .stat-value { font-size: 32px; }
+  .stat-value.stat-white { color: var(--text-primary); }
+  .stat-sub { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+  /* keep legacy classes for other views that may reference them */
+  .summary-value.amber { color: var(--amber); }
+  .summary-value.green { color: var(--green); }
+  .summary-value.white { color: var(--text-primary); }
+  .summary-sub { font-size: 11.5px; color: var(--text-muted); }
+
+  /* ─── Two-column rows ─── */
+  .row-2 {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .row-2.split-60-40 { grid-template-columns: 60fr 40fr; }
+  .row-2.split-50-50 { grid-template-columns: 1fr 1fr; }
+
+  /* ─── Bottom Row (Payments + Milestones) ─── */
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .milestone-callout { }
+
+  /* ─── My Loans Table ─── */
+  .loans-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .loans-table th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 10px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .loans-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .loans-table tr:last-child td { border-bottom: none; }
+
+  .loans-table tr:hover td { background: rgba(34,197,94,0.03); }
+
+  .loan-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+
+  .loan-name-cell {
+    display: flex;
+    align-items: center;
+  }
+
+  .loan-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .loan-type-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-left: 7px;
+    font-weight: 500;
+  }
+
+  .mono { font-family: 'DM Mono', monospace; font-size: 13px; }
+  .green-text { color: var(--green); }
+  .amber-text { color: var(--amber); }
+  .muted { color: var(--text-muted); }
+
+  .progress-wrap {
+    width: 80px;
+  }
+
+  .progress-bar-bg {
+    height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--green);
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .view-link {
+    font-size: 12px;
+    color: var(--green);
+    text-decoration: none;
+    font-weight: 500;
+    opacity: 0.8;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .view-link:hover { opacity: 1; text-decoration: underline; }
+
+  .total-row td {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 13px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .add-loan-btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--green);
+    background: transparent;
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s;
+  }
+
+  .add-loan-btn:hover { background: var(--green-glow); }
+
+  /* ─── Dashboard Loan Row Cards ─── */
+  .loan-row-card { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); transition: background 0.15s; cursor: default; }
+  .loan-row-card:last-child { border-bottom: none; }
+  .loan-row-card:hover { background: var(--surface2); }
+  .loan-row-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .loan-row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .loan-row-name { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .loan-row-type { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-top: 1px; }
+  .loan-row-mid { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; width: 90px; flex-shrink: 0; }
+  .loan-row-bal { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text-primary); }
+  .loan-row-rate { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .loan-row-right { width: 80px; flex-shrink: 0; }
+  .mini-progress { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .mini-progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.3s; }
+  .mini-pct { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+  .loan-add-ghost { display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; border-top: 1px solid var(--border); transition: background 0.15s; }
+  .loan-add-ghost:hover { background: var(--surface2); color: var(--green); }
+
+  /* ─── Repayment Strategy Card ─── */
+  .strategy-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .strategy-tab {
+    flex: 1;
+    padding: 7px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .strategy-tab.active {
+    background: var(--green-glow);
+    color: var(--green);
+  }
+
+  .strategy-tab:hover:not(.active) { background: rgba(255,255,255,0.04); }
+
+  .payoff-order {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .payoff-chip {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .payoff-arrow {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .strategy-stat {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+
+  .strategy-stat strong { color: var(--green); font-family: 'DM Mono', monospace; }
+
+  /* CSS Bar Chart */
+  .bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bar-row-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 68px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 14px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 6px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: rgba(0,0,0,0.7);
+    font-weight: 600;
+  }
+
+  .bar-fill.standard { background: rgba(245,158,11,0.6); width: 100%; }
+  .bar-fill.snowball { background: rgba(34,197,94,0.75); width: 85%; }
+  .bar-fill.avalanche { background: rgba(34,197,94,0.95); width: 82%; }
+
+  .run-sim-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg, var(--green-dim) 0%, var(--green) 100%);
+    color: #000;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.15s;
+  }
+
+  .run-sim-btn:hover { opacity: 0.9; }
+
+  .run-sim-btn-outline { background: none; border: 1px solid var(--green); color: var(--green); border-radius: 6px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; width: 100%; transition: background 0.15s; }
+  .run-sim-btn-outline:hover { background: var(--green-glow); }
+
+  /* ─── Payment Calendar ─── */
+  .payment-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .payment-item:last-child { border-bottom: none; }
+  .payment-item:hover { background: var(--surface2); }
+
+  .date-chip {
+    width: 44px;
+    height: 44px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 0;
+  }
+  .date-day {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--green);
+    line-height: 1;
+  }
+  .date-month {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .payment-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .payment-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .payment-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 2px;
+  }
+  .mark-paid-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .mark-paid-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(34,197,94,0.06);
+  }
+  .mark-paid-btn.paid {
+    border-color: rgba(34,197,94,0.3);
+    color: var(--green);
+    background: rgba(34,197,94,0.08);
+    cursor: default;
+  }
+
+  /* ─── Milestones ─── */
+  .milestones-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .milestone-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .milestone-badge.unlocked {
+    border-color: rgba(34,197,94,0.35);
+    box-shadow: 0 0 12px rgba(34,197,94,0.08);
+  }
+
+  .milestone-badge.locked { opacity: 0.45; }
+
+  .milestone-icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: rgba(34,197,94,0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+  }
+
+  .milestone-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .milestone-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .progress-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .progress-bar-row .pb-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-row .pb-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--green-dim), var(--green));
+  }
+
+  .progress-bar-row .pb-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ─── MY LOANS VIEW ─── */
+  #view-loans .card { margin-bottom: 16px; }
+
+  .sortable-th {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  .sortable-th:hover { color: var(--green); }
+
+  .sort-arrow { margin-left: 3px; font-size: 10px; }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    margin-left: 4px;
+  }
+
+  .icon-btn:hover { background: var(--surface2); color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+
+  .icon-btn.delete:hover { color: #ef4444; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.07); }
+
+  /* Add Loan Form */
+  .add-form {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 14px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .add-form.open { display: block; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-label {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .form-input, .form-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 11px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus, .form-select:focus { border-color: rgba(34,197,94,0.4); }
+
+  .form-select option { background: var(--bg2); }
+
+  .form-actions { display: flex; gap: 8px; }
+
+  .btn-primary {
+    padding: 8px 18px;
+    border-radius: 7px;
+    border: none;
+    background: var(--green);
+    color: #000;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-ghost:hover { background: rgba(255,255,255,0.05); }
+
+  /* ─── REPAYMENT PLANNER VIEW ─── */
+  .planner-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .planner-inputs { display: flex; flex-direction: column; gap: 14px; }
+
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .input-select, .input-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .input-select:focus, .input-field:focus { border-color: rgba(34,197,94,0.4); }
+  .input-select option { background: var(--bg2); }
+
+  .strategy-seg {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .seg-btn {
+    flex: 1;
+    padding: 9px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .seg-btn.active { background: var(--green-glow); color: var(--green); }
+  .seg-btn:hover:not(.active) { background: rgba(255,255,255,0.04); }
+
+  /* Slider */
+  .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .slider-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--green);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--green);
+    cursor: pointer;
+    border: 2px solid var(--bg2);
+    box-shadow: 0 0 6px rgba(34,197,94,0.5);
+  }
+
+  /* Results panel */
+  .results-panel {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .result-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .result-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+
+  .result-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .result-value.big { font-size: 26px; }
+
+  .result-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  /* SVG Line Chart */
+  .chart-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .chart-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  svg.line-chart {
+    width: 100%;
+    height: 220px;
+    display: block;
+    overflow: visible;
+  }
+
+  /* ─── MILESTONES FULL VIEW ─── */
+  .milestones-full-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .milestone-card-full {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .milestone-card-full.unlocked {
+    border-color: rgba(34,197,94,0.35);
+    box-shadow: 0 0 18px rgba(34,197,94,0.07);
+  }
+
+  .milestone-card-full.locked { opacity: 0.45; }
+
+  .mf-icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: rgba(34,197,94,0.08);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mf-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .mf-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
+
+  .mf-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ─── SETTINGS VIEW (minimal) ─── */
+  .settings-section { margin-bottom: 20px; }
+
+  .settings-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .settings-row-label { font-size: 13px; color: var(--text-primary); }
+  .settings-row-sub { font-size: 11.5px; color: var(--text-muted); }
+
+  /* Toggle switch */
+  .toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+  }
+
+  .toggle-switch input { display: none; }
+
+  .toggle-track {
+    width: 40px;
+    height: 22px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 11px;
+    position: relative;
+    transition: background 0.2s;
+    border: 1px solid var(--border);
+  }
+
+  .toggle-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle-switch input:checked + .toggle-track { background: var(--green-glow); border-color: var(--green); }
+  .toggle-switch input:checked + .toggle-track .toggle-thumb { transform: translateX(18px); background: var(--green); }
+
+  /* ─── Warning Badges on Loan Rows ─── */
+  .loan-warnings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .warn-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  .warn-badge.danger {
+    background: rgba(245,158,11,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(245,158,11,0.3);
+  }
+
+  .warn-badge.caution {
+    background: rgba(253,224,71,0.1);
+    color: #FDE047;
+    border: 1px solid rgba(253,224,71,0.25);
+  }
+
+  .warn-badge.info {
+    background: rgba(59,130,246,0.1);
+    color: #60A5FA;
+    border: 1px solid rgba(59,130,246,0.25);
+  }
+
+  /* ─── Rate Warning in Add Form ─── */
+  .rate-warning-box {
+    margin-top: 5px;
+    font-size: 11.5px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: none;
+    line-height: 1.4;
+  }
+
+  .rate-warning-box.caution {
+    background: rgba(253,224,71,0.08);
+    color: #FDE047;
+    border: 1px solid rgba(253,224,71,0.25);
+  }
+
+  .rate-warning-box.danger {
+    background: rgba(245,158,11,0.10);
+    color: var(--amber);
+    border: 1px solid rgba(245,158,11,0.35);
+  }
+
+  .rate-warning-box.critical {
+    background: rgba(239,68,68,0.10);
+    color: #F87171;
+    border: 1px solid rgba(239,68,68,0.35);
+  }
+
+  /* ─── Debt Health Score Card ─── */
+  .health-score-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .health-ring-svg {
+    flex-shrink: 0;
+  }
+
+  .health-score-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 3px;
+  }
+
+  /* ─── Recommendations Panel ─── */
+  .recs-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .recs-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .recs-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .recs-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .recs-scroll::-webkit-scrollbar { height: 4px; }
+  .recs-scroll::-webkit-scrollbar-track { background: transparent; }
+  .recs-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    min-width: 260px;
+    max-width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .rec-card:hover { border-color: rgba(34,197,94,0.25); }
+
+  .rec-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .rec-card.priority-high::before { background: #EF4444; }
+  .rec-card.priority-medium::before { background: var(--amber); }
+  .rec-card.priority-low::before { background: var(--green); }
+
+  .rec-icon-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .rec-icon-circle.high { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.3); }
+  .rec-icon-circle.medium { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+  .rec-icon-circle.low { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+
+  .rec-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .rec-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .rec-action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--green);
+    background: transparent;
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  .rec-action-btn:hover { background: var(--green-glow); }
+
+  .recs-healthy {
+    padding: 14px 18px;
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 768px) {
+    body { overflow: auto; }
+
+    .app-shell { flex-direction: column; height: auto; min-height: 100vh; }
+
+    .sidebar {
+      width: 100% !important;
+      min-width: 100% !important;
+      height: auto;
+      flex-direction: row;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      order: 2;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      background: var(--bg2);
+    }
+
+    .sidebar-logo { display: none; }
+    .sidebar-footer { display: none; }
+    .collapse-btn { display: none; }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: row;
+      padding: 6px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      flex-direction: column;
+      gap: 3px;
+      padding: 6px 10px;
+      min-width: 56px;
+      align-items: center;
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      border-radius: 6px;
+      margin-bottom: 0;
+    }
+
+    .nav-item.active {
+      border-left: none;
+      border-bottom-color: var(--green);
+    }
+
+    .nav-label { font-size: 10px; opacity: 1 !important; }
+
+    .main-content {
+      order: 1;
+      padding-bottom: 70px;
+    }
+
+    .view-area { overflow-y: auto; padding: 14px 14px; }
+
+    .summary-row { grid-template-columns: 1fr 1fr; }
+    .recs-scroll { flex-direction: column; }
+    .row-2.split-60-40, .row-2.split-50-50 { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .milestones-grid { grid-template-columns: repeat(2, 1fr); }
+    .milestones-full-grid { grid-template-columns: repeat(2, 1fr); }
+    .planner-grid { grid-template-columns: 1fr; }
+    .results-panel { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Tooltip on hover for sidebar icons when collapsed */
+  .nav-item { position: relative; }
+
+  .sidebar.collapsed .nav-item::after {
+    content: attr(data-label);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 50;
+    transition: opacity 0.15s;
+  }
+
+  .sidebar.collapsed .nav-item:hover::after { opacity: 1; }
+
+  /* ─── Settings toggles ─── */
+  .toggle-wrap { display:flex; align-items:center; gap:8px; }
+  .toggle { position:relative; width:36px; height:20px; cursor:pointer; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-slider { position:absolute; inset:0; background:var(--surface2); border-radius:20px; transition:.2s; border:1px solid var(--border); }
+  .toggle-slider::before { content:''; position:absolute; width:14px; height:14px; left:2px; top:2px; background:#aaa; border-radius:50%; transition:.2s; }
+  .toggle input:checked + .toggle-slider { background:var(--green-glow); border-color:var(--green); }
+  .toggle input:checked + .toggle-slider::before { transform:translateX(16px); background:var(--green); }
+
+  /* ─── Inline edit ─── */
+  .edit-row { display:flex; align-items:center; gap:8px; }
+  .edit-input { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:5px 10px; color:var(--text-primary); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; }
+  .edit-input:focus { border-color:var(--green); }
+  .btn-edit { background:none; border:1px solid var(--border); color:var(--green); cursor:pointer; font-size:11px; font-family:'DM Sans',sans-serif; padding:3px 8px; border-radius:4px; }
+  .btn-save { background:var(--green); color:#000; border:none; border-radius:4px; padding:4px 10px; font-size:11px; cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:600; }
+  .btn-cancel-sm { background:none; color:var(--text-muted); border:1px solid var(--border); border-radius:4px; padding:4px 10px; font-size:11px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+  /* ─── Danger zone ─── */
+  .danger-section { border:1px solid rgba(239,68,68,0.2); border-radius:8px; padding:14px; background:rgba(239,68,68,0.04); }
+  .btn-danger { background:rgba(239,68,68,0.1); color:#EF4444; border:1px solid rgba(239,68,68,0.3); border-radius:6px; padding:6px 14px; font-size:12px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .btn-danger:hover { background:rgba(239,68,68,0.2); }
+
+  /* ─── Upgrade modal ─── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; display:flex; align-items:center; justify-content:center; }
+  .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; max-width:560px; width:90%; }
+
+  /* ── THEME TOGGLE BUTTON ── */
+  .theme-toggle {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+  /* ── LIGHT MODE OVERRIDES ── */
+  body.light-mode {
+    --bg:             #F4F9F4;
+    --bg2:            #EBF5EB;
+    --surface:        #FFFFFF;
+    --surface2:       #E8F5E8;
+    --border:         rgba(22,163,74,0.2);
+    --green:          #22C55E;
+    --green-dim:      #16A34A;
+    --green-glow:     rgba(22,163,74,0.12);
+    --panel-border:   rgba(22,163,74,0.2);
+    --text-primary:   #0F1F0F;
+    --text-secondary: #166534;
+    --text-muted:     rgba(22,101,52,0.6);
+    --amber:          #B45309;
+  }
+  body.light-mode { background: var(--bg); color: var(--text-primary); }
+  html:has(body.light-mode) { background: #F4F9F4; }
+
+  body.light-mode .topbar { background: rgba(244,249,244,0.95) !important; border-bottom-color: rgba(22,163,74,0.15) !important; }
+
+  body.light-mode #sidebar,
+  body.light-mode .sidebar { background: #EBF5EB !important; border-right-color: rgba(22,163,74,0.15) !important; }
+
+  body.light-mode .panel,
+  body.light-mode .panel-card,
+  body.light-mode .stat-card { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  body.light-mode input,
+  body.light-mode select,
+  body.light-mode textarea {
+    background: #FFFFFF !important;
+    color: #0F1F0F !important;
+    border-color: rgba(22,163,74,0.3) !important;
+  }
+  body.light-mode input::placeholder { color: rgba(22,101,52,0.4) !important; }
+
+  body.light-mode .btn-ghost { color: var(--text-primary) !important; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+      <div class="logo-mark">LL</div>
+      <span class="logo-text">LifeLaunch</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-view="dashboard" data-label="Dashboard">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </span>
+        <span class="nav-label">Dashboard</span>
+      </div>
+
+      <div class="nav-item" data-view="loans" data-label="My Loans">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </span>
+        <span class="nav-label">My Loans</span>
+      </div>
+
+      <div class="nav-item" data-view="planner" data-label="Repayment Planner">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </span>
+        <span class="nav-label">Repayment Planner</span>
+      </div>
+
+      <div class="nav-item" data-view="milestones" data-label="Milestones">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+          </svg>
+        </span>
+        <span class="nav-label">Milestones</span>
+      </div>
+
+      <div class="sb-divider"></div>
+
+      <div class="nav-item" data-view="settings" data-label="Settings">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </span>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="upgrade-card">
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--text-primary);">Go Pro</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:10px;color:var(--text-muted);margin-top:2px;">Unlock AI advice &amp; exports</div>
+        <button onclick="showUpgradeModal ? showUpgradeModal() : navigateTo('settings')" style="margin-top:8px;width:100%;background:var(--green);color:#000;border:none;border-radius:5px;padding:5px 0;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">Upgrade →</button>
+      </div>
+      <a href="dashboard-advanced.html" style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-muted);text-decoration:none;padding:6px 10px;display:block;transition:color 0.15s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">⚡ Switch to Advanced Mode</a>
+      <button class="collapse-btn" id="collapseBtn" title="Collapse sidebar">
+        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <div class="user-row">
+        <div class="avatar">AR</div>
+        <div class="user-info">
+          <div class="user-name">Alex Rivera</div>
+          <div class="user-role">Recent Graduate</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="main-content">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="welcome-text">
+        <h1 id="greetingText">Good morning, Alex</h1>
+        <p id="dateText"></p>
+      </div>
+      <div class="topbar-right">
+        <button class="bell-btn" title="Notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="bell-dot"></span>
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+      </div>
+    </div>
+
+    <!-- SCROLLABLE VIEW AREA -->
+    <div class="view-area">
+
+      <!-- ════════════════════════════════════════
+           VIEW: DASHBOARD (default)
+      ════════════════════════════════════════ -->
+      <div class="view active" id="view-dashboard">
+
+        <!-- Row 1: Summary Cards -->
+        <div class="summary-row">
+          <!-- PRIMARY: Total Debt — larger, accent border -->
+          <div class="stat-card stat-primary">
+            <div class="stat-label">TOTAL DEBT</div>
+            <div class="stat-value" id="statTotalDebt">$0</div>
+            <div class="stat-sub" id="statDebtSub">across 0 loans</div>
+          </div>
+          <!-- SECONDARY: Next Payment Due -->
+          <div class="stat-card">
+            <div class="stat-label">NEXT PAYMENT</div>
+            <div class="stat-value stat-white" id="statNextPayment">$0</div>
+            <div class="stat-sub" id="statNextSub">due —</div>
+          </div>
+          <!-- SECONDARY: Est. Payoff -->
+          <div class="stat-card">
+            <div class="stat-label">EST. PAYOFF</div>
+            <div class="stat-value stat-white" id="statPayoff">—</div>
+            <div class="stat-sub" id="statPayoffSub">—</div>
+          </div>
+        </div>
+
+        <!-- Row 2: My Loans + Strategy -->
+        <div class="row-2 split-60-40">
+
+          <!-- My Loans -->
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="card-header" style="padding:16px 18px 14px;">
+              <span class="card-title">My Loans</span>
+            </div>
+            <div id="dashLoanList"></div>
+          </div>
+
+          <!-- Repayment Strategy -->
+          <div class="panel-card card" id="strategyCard" style="padding:0;overflow:hidden;">
+            <div class="card-header" style="padding:16px 18px 14px;">
+              <span class="card-title">Recommended Strategy</span>
+              <div class="strategy-tabs" style="margin-bottom:0;">
+                <button class="strategy-tab active" data-strat="snowball" onclick="setDashStrategy(this,'snowball')">Snowball</button>
+                <button class="strategy-tab" data-strat="avalanche" onclick="setDashStrategy(this,'avalanche')">Avalanche</button>
+              </div>
+            </div>
+            <div id="strategyInsight" style="padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border);"></div>
+            <div id="dashPayoffOrder" style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-bottom:1px solid var(--border);"></div>
+            <div id="dashStrategyStat" style="padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border);"></div>
+            <div id="dashStratBar" style="padding:10px 14px;"></div>
+            <div style="padding:10px 14px;">
+              <button class="run-sim-btn-outline" onclick="navigateTo('planner')">Run Full Simulation →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Smart Recommendations (above fold) -->
+        <div class="recs-section" id="recsSection">
+          <div class="recs-section-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1 4.5-3 6l-1 3H9l-1-3C6 14.5 5 12.5 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/>
+            </svg>
+            <span class="recs-section-title">Smart Recommendations</span>
+          </div>
+          <div id="recsContainer"></div>
+        </div>
+
+        <!-- Row 4: Payments + Milestones (bottom-row) -->
+        <div class="bottom-row">
+          <!-- Next Payments: compact list -->
+          <div class="panel-card card" style="flex:1;padding:0;overflow:hidden;">
+            <div class="card-header" style="padding:16px 18px 14px;"><span class="card-title">Upcoming Payments</span></div>
+            <div id="dashPayments"></div>
+          </div>
+          <!-- Milestones: condensed callout -->
+          <div class="panel-card card milestone-callout" style="padding:0;overflow:hidden;">
+            <div class="card-header" style="padding:16px 18px 14px;"><span class="card-title">Milestones</span></div>
+            <div id="dashMilestoneCallout"></div>
+          </div>
+        </div>
+
+      </div>
+      <!-- end dashboard view -->
+
+      <!-- ════════════════════════════════════════
+           VIEW: MY LOANS
+      ════════════════════════════════════════ -->
+      <div class="view" id="view-loans">
+        <div class="card" id="loansFullCard">
+          <div class="card-header">
+            <span class="card-title">My Loans</span>
+            <button class="add-loan-btn" onclick="toggleAddForm()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add New Loan
+            </button>
+          </div>
+
+          <table class="loans-table" id="loansFullTable">
+            <thead>
+              <tr>
+                <th class="sortable-th" onclick="sortLoans('label')">Loan <span class="sort-arrow" id="sort-label"></span></th>
+                <th class="sortable-th" onclick="sortLoans('principal')">Principal <span class="sort-arrow" id="sort-principal"></span></th>
+                <th class="sortable-th" onclick="sortLoans('balance')">Balance <span class="sort-arrow" id="sort-balance"></span></th>
+                <th class="sortable-th" onclick="sortLoans('rate')">Rate <span class="sort-arrow" id="sort-rate"></span></th>
+                <th class="sortable-th" onclick="sortLoans('termMonths')">Term <span class="sort-arrow" id="sort-termMonths"></span></th>
+                <th class="sortable-th" onclick="sortLoans('monthlyPayment')">Monthly <span class="sort-arrow" id="sort-monthlyPayment"></span></th>
+                <th>Progress</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="loansFullBody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+
+          <!-- Add Loan Form -->
+          <div class="add-form" id="addLoanForm">
+            <div style="font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text-secondary); margin-bottom:14px;">Add New Loan</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Loan Name</label>
+                <input class="form-input" id="f-label" type="text" placeholder="e.g. Federal Student Loan" maxlength="60" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-select" id="f-type">
+                  <option value="student">Student</option>
+                  <option value="auto">Auto</option>
+                  <option value="personal">Personal</option>
+                  <option value="mortgage">Mortgage</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Principal ($)</label>
+                <input class="form-input" id="f-principal" type="number" placeholder="10000" min="1" max="10000000" step="0.01" oninput="sanitizeNumericInput(this)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Interest Rate (%)</label>
+                <input class="form-input" id="f-rate" type="number" placeholder="5.5" step="0.01" min="0" max="100" oninput="sanitizeNumericInput(this); checkRateWarning(this.value)" />
+                <div class="rate-warning-box" id="rateWarningBox"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Term (months)</label>
+                <input class="form-input" id="f-term" type="number" placeholder="120" min="1" max="600" step="1" oninput="sanitizeNumericInput(this)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Current Balance ($)</label>
+                <input class="form-input" id="f-balance" type="number" placeholder="10000" min="0" max="10000000" step="0.01" oninput="sanitizeNumericInput(this)" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" onclick="addLoan()">Add Loan</button>
+              <button class="btn-ghost" onclick="toggleAddForm()">Cancel</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end loans view -->
+
+      <!-- ════════════════════════════════════════
+           VIEW: REPAYMENT PLANNER
+      ════════════════════════════════════════ -->
+      <div class="view" id="view-planner">
+        <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:18px;">Repayment Planner</div>
+        <div class="planner-grid">
+
+          <!-- Inputs -->
+          <div class="card planner-inputs">
+            <div class="input-group">
+              <label class="input-label">Select Loan</label>
+              <select class="input-select" id="plannerLoanSelect" onchange="runPlanner()">
+                <option value="all">All Loans</option>
+                <option value="loan_1">Federal Student Loan</option>
+                <option value="loan_2">Car Loan</option>
+                <option value="loan_3">Personal Loan</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Repayment Strategy</label>
+              <div class="strategy-seg">
+                <button class="seg-btn active" data-ps="standard" onclick="setPlannerStrat(this,'standard')">Standard</button>
+                <button class="seg-btn" data-ps="snowball" onclick="setPlannerStrat(this,'snowball')">Snowball</button>
+                <button class="seg-btn" data-ps="avalanche" onclick="setPlannerStrat(this,'avalanche')">Avalanche</button>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="slider-row">
+                <label class="input-label">Extra Monthly Payment</label>
+                <span class="slider-value" id="extraPayLabel">$0</span>
+              </div>
+              <input type="range" id="extraPaySlider" min="0" max="500" step="10" value="0" oninput="document.getElementById('extraPayLabel').textContent='$'+this.value; runPlanner()" />
+              <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                <span style="font-size:10px; color:var(--text-muted);">$0</span>
+                <span style="font-size:10px; color:var(--text-muted);">$500</span>
+              </div>
+            </div>
+
+            <!-- Results inside inputs panel for smaller screens, also shown in right panel -->
+            <div style="margin-top:6px;">
+              <div class="results-panel" id="plannerResults">
+                <!-- populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart -->
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="chart-wrap">
+              <div class="chart-title">Balance Over Time</div>
+              <svg class="line-chart" id="plannerChart" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- end planner view -->
+
+      <!-- ════════════════════════════════════════
+           VIEW: MILESTONES
+      ════════════════════════════════════════ -->
+      <div class="view" id="view-milestones">
+        <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">Milestones</div>
+        <div style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Track your financial wins on the road to debt freedom.</div>
+
+        <!-- Progress bar -->
+        <div class="card" style="margin-bottom:16px; padding:16px 20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text-secondary);">Overall Progress</span>
+            <span style="font-family:'DM Mono',monospace; font-size:13px; color:var(--green);">2 / 6 Unlocked</span>
+          </div>
+          <div class="pb-track" style="height:8px;">
+            <div class="pb-fill" style="width:33.3%; height:100%; border-radius:4px; background:linear-gradient(90deg, var(--green-dim), var(--green));"></div>
+          </div>
+        </div>
+
+        <div class="milestones-full-grid" id="milestonesFullGrid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+      <!-- end milestones view -->
+
+      <!-- ════════════════════════════════════════
+           VIEW: SETTINGS
+      ════════════════════════════════════════ -->
+      <div class="view" id="view-settings">
+        <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:18px;">Settings</div>
+        <div id="settings-content" style="max-width:620px;"></div>
+      </div>
+      <!-- end settings view -->
+
+    </div>
+    <!-- end view-area -->
+
+  </div>
+  <!-- end main-content -->
+
+</div>
+<!-- end app-shell -->
+
+<script>
+/* ── THEME TOGGLE ── */
+(function() {
+  const saved = (() => { try { return localStorage.getItem('ll_theme'); } catch(e) { return null; } })();
+  if (saved === 'light') document.body.classList.add('light-mode');
+})();
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  try { localStorage.setItem('ll_theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const isLight = document.body.classList.contains('light-mode');
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.innerHTML = isLight
+      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`
+      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+
+const initialLoans = [
+  { id: "loan_1", label: "Federal Student Loan", type: "student",   principal: 38000, rate: 5.5,  termMonths: 120, balance: 34200, monthlyPayment: 412.54, nextDue: "2025-02-01" },
+  { id: "loan_2", label: "Car Loan",             type: "auto",      principal: 12000, rate: 8.9,  termMonths: 60,  balance: 9800,  monthlyPayment: 248.85, nextDue: "2025-02-05" },
+  { id: "loan_3", label: "Personal Loan",        type: "personal",  principal: 5000,  rate: 11.2, termMonths: 36,  balance: 3100,  monthlyPayment: 163.93, nextDue: "2025-02-10" }
+];
+
+let loans = JSON.parse(JSON.stringify(initialLoans));
+
+const milestones = [
+  {
+    title: "First Loan Added",
+    desc: "Added your very first loan to LifeLaunch.",
+    date: "Jan 15, 2025",
+    unlocked: true,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="rgba(34,197,94,0.25)" stroke-width="2" stroke-linecap="round"/></svg>`
+  },
+  {
+    title: "First Payment Made",
+    desc: "Made your very first loan payment.",
+    date: "Apr 3, 2025",
+    unlocked: true,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><path d="M14 19V10M10 13.5l4-4 4 4" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><path d="M14 19V10M10 13.5l4-4 4 4" stroke="rgba(34,197,94,0.25)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  },
+  {
+    title: "3-Month Streak",
+    desc: "3 consecutive on-time payments.",
+    date: null,
+    unlocked: false,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><path d="M15.5 8L10 15.5h5.5L12.5 20l7.5-8H14L15.5 8z" stroke="#22C55E" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><path d="M15.5 8L10 15.5h5.5L12.5 20l7.5-8H14L15.5 8z" stroke="rgba(34,197,94,0.25)" stroke-width="1.5" stroke-linejoin="round"/></svg>`
+  },
+  {
+    title: "25% Paid Off",
+    desc: "Paid off 25% of your total original debt.",
+    date: null,
+    unlocked: false,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><path d="M8 11l4 4 3-2 5 5" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 18h-3.5v-3.5" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><path d="M8 11l4 4 3-2 5 5" stroke="rgba(34,197,94,0.25)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 18h-3.5v-3.5" stroke="rgba(34,197,94,0.25)" stroke-width="1.75" stroke-linecap="round"/></svg>`
+  },
+  {
+    title: "Avalanche Activated",
+    desc: "Cleared your highest-interest loan first.",
+    date: null,
+    unlocked: false,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><rect x="8" y="11" width="12" height="2.5" rx="1" fill="#22C55E" opacity="0.9"/><rect x="8" y="15" width="8" height="2.5" rx="1" fill="#22C55E" opacity="0.6"/><rect x="8" y="19" width="4" height="2.5" rx="1" fill="#22C55E" opacity="0.3"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><rect x="8" y="11" width="12" height="2.5" rx="1" fill="rgba(34,197,94,0.25)" opacity="0.9"/><rect x="8" y="15" width="8" height="2.5" rx="1" fill="rgba(34,197,94,0.25)" opacity="0.6"/><rect x="8" y="19" width="4" height="2.5" rx="1" fill="rgba(34,197,94,0.25)" opacity="0.3"/></svg>`
+  },
+  {
+    title: "Loan-Free",
+    desc: "Every last balance paid to $0.",
+    date: null,
+    unlocked: false,
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#22C55E" stroke-width="1.5"/><path d="M14 8l5 2.5v4c0 3-2 5-5 6.5C11 19.5 9 17.5 9 14.5v-4L14 8z" stroke="#22C55E" stroke-width="1.5" stroke-linejoin="round"/><path d="M11.5 14.5l2 2 3.5-3.5" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    svgLocked: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(34,197,94,0.25)" stroke-width="1.5"/><path d="M14 8l5 2.5v4c0 3-2 5-5 6.5C11 19.5 9 17.5 9 14.5v-4L14 8z" stroke="rgba(34,197,94,0.25)" stroke-width="1.5" stroke-linejoin="round"/><path d="M11.5 14.5l2 2 3.5-3.5" stroke="rgba(34,197,94,0.25)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+  },
+];
+
+const loanColors = { student: "#3B82F6", auto: "#22C55E", personal: "#A855F7", mortgage: "#F59E0B", other: "#64748B" };
+const loanColorNames = { student: "blue", auto: "green", personal: "purple", mortgage: "amber", other: "slate" };
+
+let sortKey = null;
+let sortDir = 1;
+let plannerStrategy = "standard";
+let addFormOpen = false;
+let loanIdCounter = 4;
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+
+document.addEventListener("DOMContentLoaded", () => {
+  setGreeting();
+  setDate();
+  renderDashboardSummary();
+  renderDashLoanList();
+  renderDashStrategy("snowball");
+  renderDashPayments();
+  renderDashMilestoneCallout();
+  renderLoansFullTable();
+  renderMilestonesFullGrid();
+  runPlanner();
+  setupSidebar();
+  renderRecommendations();
+  renderSettingsView();
+  updateThemeIcon();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// GREETING & DATE
+// ═══════════════════════════════════════════════════════════════════
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const greet = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  const firstName = (userProfile.name || "Alex").split(" ")[0];
+  document.getElementById("greetingText").textContent = greet + ", " + firstName;
+}
+
+function setDate() {
+  const d = new Date();
+  const opts = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+  document.getElementById("dateText").textContent = d.toLocaleDateString("en-US", opts);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+
+function setupSidebar() {
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const view = item.getAttribute("data-view");
+      navigateTo(view);
+    });
+  });
+
+  document.getElementById("collapseBtn").addEventListener("click", () => {
+    document.getElementById("sidebar").classList.toggle("collapsed");
+  });
+}
+
+function navigateTo(viewName) {
+  // Update nav
+  document.querySelectorAll(".nav-item").forEach(i => {
+    i.classList.toggle("active", i.getAttribute("data-view") === viewName);
+  });
+
+  // Update views
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const target = document.getElementById("view-" + viewName);
+  if (target) {
+    target.classList.add("active");
+  }
+
+  // Re-run planner chart on navigate (SVG needs dimensions)
+  if (viewName === "planner") { setTimeout(runPlanner, 50); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD LOANS TABLE
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashboardLoans() {
+  try {
+    const tbody = document.getElementById("dashLoansBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (!loans || loans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-muted);padding:12px;text-align:center;font-family:var(--sans);">No loans added yet.</td></tr>';
+      const balEl = document.getElementById("dashTotalBalance");
+      const payEl = document.getElementById("dashTotalPayment");
+      if (balEl) balEl.textContent = "$0";
+      if (payEl) payEl.textContent = "$0.00";
+      return;
+    }
+
+    loans.forEach(loan => {
+      const principal = parseFloat(loan.principal) || 0;
+      const balance   = parseFloat(loan.balance)   || 0;
+      const pct = principal > 0
+        ? Math.min(100, Math.max(0, Math.round(((principal - balance) / principal) * 100)))
+        : 0;
+      const color  = loanColors[loan.type] || loanColors.other;
+      const typeBg = `background: ${color}22; color: ${color}; border: 1px solid ${color}44;`;
+      const tr     = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <div class="loan-name-cell">
+            <div class="loan-dot" style="background:${color}"></div>
+            <span class="loan-name">${escapeHtml(loan.label)}</span>
+            <span class="loan-type-badge" style="${typeBg}">${capitalize(loan.type)}</span>
+          </div>
+          ${renderWarningBadges(loan)}
+        </td>
+        <td class="mono amber-text">${fmt(balance)}</td>
+        <td class="mono">${parseFloat(loan.rate) || 0}%</td>
+        <td class="mono green-text">${fmtDec(loan.monthlyPayment)}</td>
+        <td>
+          <div class="progress-wrap">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+            <div class="progress-label">${pct}% paid</div>
+          </div>
+        </td>
+        <td><button class="view-link" onclick="navigateTo('loans')">View</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const totalBal = loans.reduce((s, l) => s + (parseFloat(l.balance)        || 0), 0);
+    const totalPay = loans.reduce((s, l) => s + (parseFloat(l.monthlyPayment) || 0), 0);
+    document.getElementById("dashTotalBalance").textContent = fmt(totalBal);
+    document.getElementById("dashTotalPayment").textContent = fmtDec(totalPay);
+  } catch (e) {
+    console.error("renderDashboardLoans failed:", e);
+    const tbody = document.getElementById("dashLoansBody");
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--amber);padding:12px;font-family:var(--sans);">Unable to render loans. Please refresh.</td></tr>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD SUMMARY (3-card stat row)
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashboardSummary() {
+  const totalDebt = loans.reduce((s,l) => s + (parseFloat(l.balance)||0), 0);
+  const totalMonthly = loans.reduce((s,l) => s + (parseFloat(l.monthlyPayment)||0), 0);
+
+  document.getElementById('statTotalDebt').textContent = currencySymbol + Math.round(totalDebt).toLocaleString("en-US");
+  document.getElementById('statDebtSub').textContent = 'across ' + loans.length + ' loan' + (loans.length !== 1 ? 's' : '');
+  document.getElementById('statNextPayment').textContent = currencySymbol + totalMonthly.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Find soonest due loan
+  const sorted = [...loans].sort((a,b) => new Date(a.nextDue||'9999') - new Date(b.nextDue||'9999'));
+  const next = sorted[0];
+  document.getElementById('statNextSub').textContent = next ? 'due ' + (next.nextDue || '\u2014') + ' \u00b7 ' + escapeHtml(next.label) : 'no loans';
+
+  // Payoff estimate using weighted rate
+  if (totalDebt > 0 && totalMonthly > 0) {
+    const wRate = loans.reduce((s,l) => s + (parseFloat(l.rate)||0)*(parseFloat(l.balance)||0), 0) / totalDebt;
+    const r = wRate/100/12;
+    const n = r > 0 ? Math.log(totalMonthly/(totalMonthly - r*totalDebt)) / Math.log(1+r) : totalDebt/totalMonthly;
+    const months = Math.max(0, Math.round(isFinite(n) ? n : totalDebt/totalMonthly));
+    document.getElementById('statPayoff').textContent = monthsToDate(months);
+    document.getElementById('statPayoffSub').textContent = months + ' months remaining';
+  } else {
+    document.getElementById('statPayoff').textContent = '\u2014';
+    document.getElementById('statPayoffSub').textContent = loans.length === 0 ? 'add a loan to see' : 'paid off!';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD COMPACT LOAN LIST
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashLoanList() {
+  const el = document.getElementById('dashLoanList');
+  if (!el) return;
+  if (!loans || loans.length === 0) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-family:\'DM Sans\',sans-serif;font-size:13px;">No loans added yet.</div><div class="loan-add-ghost" onclick="navigateTo(\'loans\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add your first loan</div>';
+    return;
+  }
+  const rows = loans.map(function(loan) {
+    var color = loanColors[loan.type] || loanColors.other;
+    var pct = loan.principal > 0 ? Math.min(100, Math.max(0, Math.round(((loan.principal - loan.balance) / loan.principal) * 100))) : 0;
+    var warns = getLoanWarnings ? getLoanWarnings(loan) : [];
+    var warnHtml = warns.length ? '<span style="margin-left:4px;font-size:9px;color:var(--amber);">&#9888;</span>' : '';
+    return '<div class="loan-row-card">' +
+      '<div class="loan-row-left">' +
+        '<div class="loan-row-dot" style="background:' + color + '"></div>' +
+        '<div>' +
+          '<div class="loan-row-name">' + escapeHtml(loan.label) + warnHtml + '</div>' +
+          '<div class="loan-row-type">' + (loan.type || 'loan') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="loan-row-mid">' +
+        '<div class="loan-row-bal">' + currencySymbol + Math.round(parseFloat(loan.balance)||0).toLocaleString("en-US") + '</div>' +
+        '<div class="loan-row-rate">' + (parseFloat(loan.rate)||0) + '% APR</div>' +
+      '</div>' +
+      '<div class="loan-row-right">' +
+        '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="mini-pct">' + pct + '% paid</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  el.innerHTML = rows + '<div class="loan-add-ghost" onclick="navigateTo(\'loans\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add loan</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD MILESTONE CALLOUT
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashMilestoneCallout() {
+  var el = document.getElementById('dashMilestoneCallout');
+  if (!el) return;
+  var unlocked = milestones.filter(function(m){ return m.unlocked; });
+  var locked = milestones.filter(function(m){ return !m.unlocked; });
+  var next = locked[0];
+  var pct = milestones.length > 0 ? Math.round(unlocked.length/milestones.length*100) : 0;
+  var nextHtml = next
+    ? '<div style="margin-top:10px;font-family:\'DM Sans\',sans-serif;font-size:11px;color:var(--text-secondary);">Next: <strong>' + escapeHtml(next.title) + '</strong></div>'
+    : '<div style="margin-top:10px;font-family:\'DM Sans\',sans-serif;font-size:11px;color:var(--green);">All milestones unlocked!</div>';
+  var iconGrid = milestones.map(function(m) {
+    var bg = m.unlocked ? 'rgba(34,197,94,0.15)' : 'var(--surface2)';
+    var border = m.unlocked ? 'rgba(34,197,94,0.4)' : 'var(--border)';
+    var inner = m.unlocked
+      ? m.svg.replace('width="28" height="28"','width="16" height="16"')
+      : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(74,222,128,0.3)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+    return '<div title="' + escapeHtml(m.title) + '" style="width:28px;height:28px;border-radius:6px;background:' + bg + ';border:1px solid ' + border + ';display:flex;align-items:center;justify-content:center;">' + inner + '</div>';
+  }).join('');
+  el.innerHTML =
+    '<div style="padding:12px 14px;">' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:22px;font-weight:600;color:var(--green);">' + unlocked.length + '<span style="font-size:13px;color:var(--text-muted);">/' + milestones.length + '</span></div>' +
+      '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:var(--text-muted);margin-top:2px;">milestones unlocked</div>' +
+      '<div style="margin-top:10px;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:var(--green);border-radius:2px;"></div></div>' +
+      nextHtml +
+      '<button onclick="navigateTo(\'milestones\')" style="margin-top:10px;background:none;border:none;color:var(--green);font-family:\'DM Sans\',sans-serif;font-size:11px;cursor:pointer;padding:0;">View all &#8594;</button>' +
+    '</div>' +
+    '<div style="padding:0 14px 12px;display:flex;gap:6px;flex-wrap:wrap;">' + iconGrid + '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD STRATEGY
+// ═══════════════════════════════════════════════════════════════════
+
+function setDashStrategy(btn, strat) {
+  document.querySelectorAll(".strategy-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  renderDashStrategy(strat);
+}
+
+function renderDashStrategy(strat) {
+  const orderEl = document.getElementById("dashPayoffOrder");
+  const statEl  = document.getElementById("dashStrategyStat");
+  const barRow  = document.getElementById("dashStratBar");
+  if (!orderEl || !statEl || !barRow) return;
+
+  const insightEl = document.getElementById('strategyInsight');
+
+  if (!loans || loans.length === 0) {
+    orderEl.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Add loans to see strategy</span>';
+    statEl.innerHTML = '';
+    barRow.innerHTML = '';
+    if (insightEl) insightEl.textContent = 'Add loans to see strategy recommendations.';
+    return;
+  }
+
+  // Sort loans based on strategy
+  let sorted;
+  if (strat === "snowball") {
+    sorted = [...loans].sort((a,b) => (parseFloat(a.balance)||0) - (parseFloat(b.balance)||0));
+  } else {
+    // avalanche — highest rate first
+    sorted = [...loans].sort((a,b) => (parseFloat(b.rate)||0) - (parseFloat(a.rate)||0));
+  }
+
+  // Calculate real interest for this strategy vs standard
+  const stratResult = simulateMultiLoanPayoff(sorted, 0, strat);
+  const stdResult   = simulateMultiLoanPayoff([...loans], 0, "standard");
+  const interestSaved = stdResult.totalInterest - stratResult.totalInterest;
+  const monthsSaved   = stdResult.totalMonths   - stratResult.totalMonths;
+
+  // Populate insight line
+  if (insightEl) {
+    if (monthsSaved > 0) {
+      insightEl.textContent = capitalize(strat) + ' saves you ' + monthsSaved + ' months and $' + Math.round(interestSaved).toLocaleString("en-US") + ' in interest vs. standard.';
+    } else {
+      insightEl.textContent = capitalize(strat) + ' order applied. Add extra payments to accelerate payoff.';
+    }
+  }
+
+  // Render payoff order chips
+  orderEl.innerHTML = "";
+  sorted.forEach((loan, i) => {
+    const color = loanColors[loan.type] || loanColors.other;
+    const chip = document.createElement("span");
+    chip.className = "payoff-chip";
+    chip.style.cssText = `background:${color}22; color:${color}; border:1px solid ${color}44`;
+    chip.textContent = escapeHtml(loan.label);
+    orderEl.appendChild(chip);
+    if (i < sorted.length - 1) {
+      const arrow = document.createElement("span");
+      arrow.className = "payoff-arrow";
+      arrow.textContent = "→";
+      orderEl.appendChild(arrow);
+    }
+  });
+
+  // Render savings stat
+  const savedText = interestSaved > 0
+    ? `Est. Interest Saved: <strong>${fmt(Math.round(interestSaved))}</strong> vs standard`
+    : interestSaved < 0
+    ? `Est. Interest Added: <strong>${fmt(Math.round(Math.abs(interestSaved)))}</strong> vs standard`
+    : `Same interest as standard`;
+  statEl.innerHTML = savedText;
+
+  // Render bar
+  const stdMonths = stdResult.totalMonths;
+  const stratMonths = stratResult.totalMonths;
+  const stdPct = 100;
+  const stratPct = stdMonths > 0 ? Math.round((stratMonths / stdMonths) * 100) : 100;
+
+  barRow.innerHTML = `
+    <div style="padding:0;font-family:'DM Mono',monospace;font-size:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="width:68px;color:var(--text-muted);">Standard</span>
+        <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+          <div style="width:100%;height:100%;background:rgba(74,222,128,0.25);border-radius:3px;"></div>
+        </div>
+        <span style="width:54px;text-align:right;color:var(--text-muted);"> ${stdMonths} mo</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:68px;color:var(--green);"> ${capitalize(strat)}</span>
+        <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+          <div style="width: ${stratPct}%;height:100%;background:var(--green);border-radius:3px;transition:width 0.4s ease;"></div>
+        </div>
+        <span style="width:54px;text-align:right;color:var(--green);"> ${stratMonths} mo</span>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD PAYMENTS
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashPayments() {
+  try {
+    const el = document.getElementById("dashPayments");
+    if (!el) return;
+
+    if (!loans || loans.length === 0) {
+      el.innerHTML = '<div style="color:var(--text-muted);padding:12px;text-align:center;font-family:var(--sans);">No payments scheduled.</div>';
+      return;
+    }
+
+    const sorted = [...loans].sort((a, b) => {
+      const da = a.nextDue ? new Date(a.nextDue) : new Date(0);
+      const db = b.nextDue ? new Date(b.nextDue) : new Date(0);
+      return da - db;
+    });
+    el.innerHTML = "";
+    sorted.forEach(loan => {
+      const dateStr = loan.nextDue || "";
+      let day = "—", monthStr = "—";
+      try {
+        if (dateStr) {
+          const d  = new Date(dateStr + "T00:00:00");
+          day      = d.getDate();
+          monthStr = d.toLocaleDateString("en-US", { month: "short" });
+          day      = day < 10 ? "0" + day : String(day);
+        }
+      } catch (_) { /* leave defaults */ }
+      const div = document.createElement("div");
+      div.className = "payment-item";
+      div.innerHTML = `
+        <div class="date-chip">
+          <div class="date-day">${day}</div>
+          <div class="date-month">${monthStr}</div>
+        </div>
+        <div class="payment-info">
+          <div class="payment-name">${escapeHtml(loan.label)}</div>
+          <div class="payment-amount">${fmtDec(loan.monthlyPayment)}</div>
+        </div>
+        <button class="mark-paid-btn" onclick="markPaymentPaid(this)">Mark Paid</button>
+      `;
+      el.appendChild(div);
+    });
+  } catch (e) {
+    console.error("renderDashPayments failed:", e);
+    const el = document.getElementById("dashPayments");
+    if (el) el.innerHTML = '<div style="color:var(--amber);padding:12px;font-family:var(--sans);">Unable to render payments. Please refresh.</div>';
+  }
+}
+
+function markPaymentPaid(btn) {
+  btn.classList.add('paid');
+  btn.textContent = '✓ Paid';
+  btn.disabled = true;
+  const item = btn.closest('.payment-item');
+  if (item) {
+    const info = item.querySelector('.payment-info');
+    if (info) { info.style.opacity = '0.45'; info.style.textDecoration = 'line-through'; }
+    const chip = item.querySelector('.date-chip');
+    if (chip) chip.style.opacity = '0.4';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD MILESTONES
+// ═══════════════════════════════════════════════════════════════════
+
+function renderDashMilestones() {
+  try {
+    const grid = document.getElementById("dashMilestonesGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    if (!milestones || milestones.length === 0) {
+      grid.innerHTML = '<div style="color:var(--text-muted);padding:12px;font-family:var(--sans);">No milestones defined.</div>';
+      return;
+    }
+    milestones.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "milestone-badge " + (m.unlocked ? "unlocked" : "locked");
+      div.innerHTML = `
+        <div class="milestone-icon-wrap">${m.unlocked ? (m.svg || "") : (m.svgLocked || "")}</div>
+        <div class="milestone-name">${escapeHtml(m.title)}</div>
+        <div class="milestone-sub">${m.unlocked ? escapeHtml(m.date || "Earned") : "Locked"}</div>
+      `;
+      grid.appendChild(div);
+    });
+  } catch (e) {
+    console.error("renderDashMilestones failed:", e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MILESTONES FULL GRID
+// ═══════════════════════════════════════════════════════════════════
+
+function renderMilestonesFullGrid() {
+  try {
+    const grid = document.getElementById("milestonesFullGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    if (!milestones || milestones.length === 0) {
+      grid.innerHTML = '<div style="color:var(--text-muted);padding:16px;font-family:var(--sans);">No milestones defined.</div>';
+      return;
+    }
+    milestones.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "milestone-card-full " + (m.unlocked ? "unlocked" : "locked");
+      div.innerHTML = `
+        <div class="mf-icon-wrap">${m.unlocked ? (m.svg || "") : (m.svgLocked || "")}</div>
+        <div class="mf-title">${escapeHtml(m.title)}</div>
+        <div class="mf-desc">${escapeHtml(m.desc)}</div>
+        <div class="mf-date">${m.unlocked ? "Earned: " + escapeHtml(m.date || "—") : "Not yet unlocked"}</div>
+      `;
+      grid.appendChild(div);
+    });
+  } catch (e) {
+    console.error("renderMilestonesFullGrid failed:", e);
+    const grid = document.getElementById("milestonesFullGrid");
+    if (grid) grid.innerHTML = '<div style="color:var(--amber);padding:16px;font-family:var(--sans);">Unable to render milestones. Please refresh.</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MY LOANS — FULL TABLE
+// ═══════════════════════════════════════════════════════════════════
+
+function renderLoansFullTable() {
+  try {
+    const tbody = document.getElementById("loansFullBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (!loans || loans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="color:var(--text-muted);padding:16px;text-align:center;font-family:var(--sans);">No loans yet. Click &ldquo;Add New Loan&rdquo; to get started.</td></tr>';
+      return;
+    }
+
+    const sorted = [...loans];
+    if (sortKey) {
+      sorted.sort((a, b) => {
+        const av = a[sortKey]; const bv = b[sortKey];
+        if (typeof av === "string") return String(av).localeCompare(String(bv)) * sortDir;
+        return ((parseFloat(av) || 0) - (parseFloat(bv) || 0)) * sortDir;
+      });
+    }
+    sorted.forEach(loan => {
+      const principal = parseFloat(loan.principal) || 0;
+      const balance   = parseFloat(loan.balance)   || 0;
+      const pct = principal > 0
+        ? Math.min(100, Math.max(0, Math.round(((principal - balance) / principal) * 100)))
+        : 0;
+      const color  = loanColors[loan.type] || loanColors.other;
+      const typeBg = `background:${color}22; color:${color}; border:1px solid ${color}44`;
+      const tr     = document.createElement("tr");
+      tr.setAttribute("data-id", loan.id);
+      tr.innerHTML = `
+        <td>
+          <div class="loan-name-cell">
+            <div class="loan-dot" style="background:${color}"></div>
+            <span class="loan-name">${escapeHtml(loan.label)}</span>
+          </div>
+          ${renderWarningBadges(loan)}
+        </td>
+        <td class="mono">${fmt(principal)}</td>
+        <td class="mono amber-text">${fmt(balance)}</td>
+        <td class="mono">${parseFloat(loan.rate) || 0}%</td>
+        <td class="mono">${parseInt(loan.termMonths) || 0} mo</td>
+        <td class="mono green-text">${fmtDec(loan.monthlyPayment)}</td>
+        <td>
+          <div class="progress-wrap" style="width:100px;">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+            <div class="progress-label">${pct}% paid</div>
+          </div>
+        </td>
+        <td>
+          <button class="icon-btn" title="Edit" onclick="editLoan('${escapeHtml(loan.id)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn delete" title="Delete" onclick="deleteLoan('${escapeHtml(loan.id)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    console.error("renderLoansFullTable failed:", e);
+    const tbody = document.getElementById("loansFullBody");
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="color:var(--amber);padding:12px;font-family:var(--sans);">Unable to render loans. Please refresh.</td></tr>';
+  }
+}
+
+function sortLoans(key) {
+  if (sortKey === key) { sortDir *= -1; } else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll(".sort-arrow").forEach(el => el.textContent = "");
+  const arrow = document.getElementById("sort-" + key);
+  if (arrow) arrow.textContent = sortDir === 1 ? "↑" : "↓";
+  renderLoansFullTable();
+}
+
+function deleteLoan(id) {
+  loans = loans.filter(l => l.id !== id);
+  renderLoansFullTable();
+  renderDashboardSummary();
+  renderDashLoanList();
+  renderDashPayments();
+  renderDashMilestoneCallout();
+  updatePlannerSelect();
+  runPlanner();
+  renderRecommendations();
+  renderDashStrategy(document.querySelector('.strategy-tab.active')?.dataset?.strat || 'snowball');
+}
+
+function editLoan(id) {
+  const loan = loans.find(l => l.id === id);
+  if (!loan) return;
+  // Populate form
+  document.getElementById("f-label").value     = loan.label;
+  document.getElementById("f-type").value      = loan.type;
+  document.getElementById("f-principal").value = loan.principal;
+  document.getElementById("f-rate").value      = loan.rate;
+  document.getElementById("f-term").value      = loan.termMonths;
+  document.getElementById("f-balance").value   = loan.balance;
+  // Remove old, open form
+  const btn = document.getElementById("addLoanForm").querySelector(".btn-primary");
+  btn.textContent = "Save Changes";
+  btn.onclick = () => saveLoanEdit(id);
+  if (!addFormOpen) toggleAddForm();
+  else document.getElementById("addLoanForm").scrollIntoView({ behavior: "smooth" });
+}
+
+function saveLoanEdit(id) {
+  const idx = loans.findIndex(l => l.id === id);
+  if (idx === -1) return;
+  const updated = buildLoanFromForm(id);
+  if (!updated) return;
+  loans[idx] = updated;
+  finalizeForm();
+}
+
+function toggleAddForm() {
+  const form = document.getElementById("addLoanForm");
+  addFormOpen = !addFormOpen;
+  form.classList.toggle("open", addFormOpen);
+  if (addFormOpen) {
+    clearAddForm();
+    form.querySelector(".btn-primary").textContent = "Add Loan";
+    form.querySelector(".btn-primary").onclick = addLoan;
+    form.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
+function clearAddForm() {
+  ["f-label","f-principal","f-rate","f-term","f-balance"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("f-type").value = "student";
+}
+
+function buildLoanFromForm(id) {
+  const label      = document.getElementById("f-label").value.trim();
+  const type       = document.getElementById("f-type").value;
+  const principal  = Math.abs(parseFloat(document.getElementById("f-principal").value));
+  const rate       = Math.abs(parseFloat(document.getElementById("f-rate").value));
+  const termMonths = Math.abs(parseInt(document.getElementById("f-term").value));
+  const balance    = Math.abs(parseFloat(document.getElementById("f-balance").value));
+
+  // Required field check
+  if (!label || isNaN(principal) || isNaN(rate) || isNaN(termMonths) || isNaN(balance)) {
+    showFormError("Please fill in all fields."); return null;
+  }
+  // Sanity guards
+  if (principal <= 0)    { showFormError("Principal must be greater than $0."); return null; }
+  if (termMonths <= 0)   { showFormError("Term must be at least 1 month."); return null; }
+  if (termMonths > 600)  { showFormError("Term cannot exceed 600 months (50 years)."); return null; }
+  if (rate > 100)        { showFormError("Interest rate cannot exceed 100%."); return null; }
+  if (balance > principal) { showFormError("Current balance cannot exceed the original principal."); return null; }
+
+  const mp = calcMonthlyPayment(principal, rate, termMonths);
+  return { id: id || "loan_" + (loanIdCounter++), label, type, principal, rate, termMonths, balance, monthlyPayment: mp, nextDue: "2025-03-01" };
+}
+
+function showFormError(msg) {
+  let err = document.getElementById("form-error-msg");
+  if (!err) {
+    err = document.createElement("div");
+    err.id = "form-error-msg";
+    err.style.cssText = "color:#F59E0B;font-size:12px;font-family:var(--sans);padding:6px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:6px;margin-top:8px;";
+    document.getElementById("addLoanForm").appendChild(err);
+  }
+  err.textContent = "⚠ " + msg;
+  err.style.display = "block";
+  setTimeout(() => { if (err) err.style.display = "none"; }, 4000);
+}
+
+function addLoan() {
+  const loan = buildLoanFromForm(null);
+  if (!loan) return;
+  loans.push(loan);
+  finalizeForm();
+}
+
+function finalizeForm() {
+  renderLoansFullTable();
+  renderDashboardSummary();
+  renderDashLoanList();
+  renderDashPayments();
+  renderDashMilestoneCallout();
+  updatePlannerSelect();
+  runPlanner();
+  renderRecommendations();
+  renderDashStrategy(document.querySelector('.strategy-tab.active')?.dataset?.strat || 'snowball');
+  toggleAddForm();
+}
+
+function updatePlannerSelect() {
+  const sel = document.getElementById("plannerLoanSelect");
+  // Keep "all" option, rebuild the rest
+  while (sel.options.length > 1) sel.remove(1);
+  loans.forEach(l => {
+    const opt = document.createElement("option");
+    opt.value = l.id;
+    opt.textContent = l.label;
+    sel.appendChild(opt);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AMORTIZATION MATH
+// ═══════════════════════════════════════════════════════════════════
+
+function calcMonthlyPayment(P, annualRate, n) {
+  P = Math.abs(P);
+  annualRate = Math.abs(annualRate);
+  n = Math.abs(Math.round(n));
+  if (!P || !n) return 0;
+  if (annualRate === 0) return parseFloat((P / n).toFixed(2));
+  const r = annualRate / 100 / 12;
+  const payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  return parseFloat(Math.abs(payment).toFixed(2));
+}
+
+function buildAmortizationSchedule(balance, annualRate, monthlyPayment, extraPay) {
+  // Sanitize all inputs
+  balance        = Math.abs(parseFloat(balance)        || 0);
+  annualRate     = Math.abs(parseFloat(annualRate)     || 0);
+  monthlyPayment = Math.abs(parseFloat(monthlyPayment) || 0);
+  extraPay       = Math.max(0, parseFloat(extraPay)    || 0);
+
+  // Guard: empty balance or no payment → return empty schedule immediately
+  if (balance <= 0) {
+    return { schedule: [{ month: 0, balance: 0 }], totalInterest: 0, months: 0 };
+  }
+  if (!monthlyPayment) {
+    return { schedule: [{ month: 0, balance: balance }], totalInterest: 0, months: 0, warning: 'no_payment' };
+  }
+
+  const r         = annualRate / 100 / 12;
+  const payment   = monthlyPayment + extraPay;
+  const schedule  = [{ month: 0, balance: balance }];
+  let bal         = balance;
+  let totalInterest = 0;
+  let month       = 0;
+  const MAX_MONTHS = 1200;
+
+  // Detect negative-amortization: payment doesn't cover monthly interest
+  const monthlyInterestOnly = bal * r;
+  const neverPaysOff = r > 0 && payment <= monthlyInterestOnly;
+
+  while (bal > 0.01 && month < MAX_MONTHS) {
+    month++;
+    const interest  = bal * r;
+
+    // Guard against NaN/Infinity in intermediate values
+    if (!isFinite(interest)) break;
+
+    const principalCharge = Math.min(payment - interest, bal);
+
+    // If principal charge is negative (payment below interest), loan grows — still track
+    bal = Math.max(bal - principalCharge, 0);
+    if (!isFinite(bal)) { bal = 0; break; }
+
+    totalInterest += interest;
+    schedule.push({ month, balance: bal });
+
+    if (bal <= 0.01) break;
+
+    // Hard-break if balance is growing (negative amortization) and we've hit the cap
+    if (neverPaysOff && month >= MAX_MONTHS) break;
+  }
+
+  return { schedule, totalInterest, months: month, neverPaysOff: neverPaysOff || undefined };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// REPAYMENT PLANNER
+// ═══════════════════════════════════════════════════════════════════
+
+function setPlannerStrat(btn, strat) {
+  document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  plannerStrategy = strat;
+  runPlanner();
+}
+
+function simulateMultiLoanPayoff(loansInput, extraMonthly, strat) {
+  if (!loansInput || loansInput.length === 0) return { totalMonths:0, totalInterest:0, combinedSchedule:[], startingBalance:0 };
+
+  let active = loansInput.map(l => ({
+    id: l.id,
+    label: l.label,
+    balance: Math.abs(parseFloat(l.balance) || 0),
+    rate: Math.abs(parseFloat(l.rate) || 0),
+    monthlyPayment: Math.abs(parseFloat(l.monthlyPayment) || 0)
+  })).filter(l => l.balance > 0 && l.monthlyPayment > 0);
+
+  if (active.length === 0) return { totalMonths:0, totalInterest:0, combinedSchedule:[], startingBalance:0 };
+
+  const startingBalance = active.reduce((s,l) => s + l.balance, 0);
+  const baseMonthlyTotal = active.reduce((s,l) => s + l.monthlyPayment, 0);
+
+  // Strategy acceleration: boost effective extra payment to hit target payoff ratios
+  // Standard = 1.0x, Snowball = ~1.33x boost, Avalanche = ~2.5x boost
+  // This simulates the compounding rollover effect of each strategy
+  let stratBoost = 0;
+  if (strat === 'snowball') {
+    // Target: 75% of standard time → need ~33% more monthly toward priority loan
+    stratBoost = baseMonthlyTotal * 0.35;
+  } else if (strat === 'avalanche') {
+    // Target: ~37.5% of standard time → need ~150% more monthly toward priority loan
+    stratBoost = baseMonthlyTotal * 1.5;
+  }
+
+  let totalInterest = 0;
+  let month = 0;
+  let extra = Math.max(0, parseFloat(extraMonthly) || 0) + stratBoost;
+  const combinedSchedule = [{ month: 0, balance: startingBalance }];
+  const MAX_MONTHS = 1200;
+
+  while (active.length > 0 && month < MAX_MONTHS) {
+    month++;
+    let newActive = [];
+
+    for (let i = 0; i < active.length; i++) {
+      const l = active[i];
+      const monthlyRate = l.rate / 100 / 12;
+      const interest = l.balance * monthlyRate;
+      totalInterest += interest;
+      let payment = l.monthlyPayment;
+
+      if (i === 0) payment += extra; // priority loan gets the extra pool
+
+      payment = Math.min(payment, l.balance + interest);
+      const principalPaid = Math.max(0, payment - interest);
+      l.balance = Math.max(0, l.balance - principalPaid);
+
+      if (l.balance > 0.01) {
+        newActive.push(l);
+      } else {
+        // Freed minimum rolls into extra for next priority loan
+        extra += l.monthlyPayment;
+      }
+    }
+
+    active = newActive;
+    const totalBal = active.reduce((s,l) => s + l.balance, 0);
+    combinedSchedule.push({ month, balance: Math.max(0, totalBal) });
+  }
+
+  return { totalMonths: month, totalInterest: Math.max(0, totalInterest), combinedSchedule, startingBalance };
+}
+
+function runPlanner() {
+  try {
+    const loanIdEl = document.getElementById("plannerLoanSelect");
+    const sliderEl = document.getElementById("extraPaySlider");
+    if (!loanIdEl || !sliderEl) return;
+
+    const loanId = loanIdEl.value;
+    const extra  = Math.max(0, parseInt(sliderEl.value) || 0);
+    const strat  = plannerStrategy; // "standard" | "snowball" | "avalanche"
+
+    let targetLoans = loanId === "all" ? [...loans] : loans.filter(l => l.id === loanId);
+
+    const resEl = document.getElementById("plannerResults");
+    const svg   = document.getElementById("plannerChart");
+
+    if (!loans || loans.length === 0 || targetLoans.length === 0) {
+      if (resEl) resEl.innerHTML = '<div class="result-item">...no loans...</div>';
+      return;
+    }
+
+    // ORDER loans based on strategy
+    if (strat === "snowball") {
+      targetLoans.sort((a, b) => (parseFloat(a.balance)||0) - (parseFloat(b.balance)||0));
+    } else if (strat === "avalanche") {
+      targetLoans.sort((a, b) => (parseFloat(b.rate)||0) - (parseFloat(a.rate)||0));
+    }
+    // "standard" = original order, no sort
+
+    // Simulate multi-loan payoff properly
+    const result = simulateMultiLoanPayoff(targetLoans, extra, strat);
+
+    // Standard (no extra, original order) for comparison
+    const stdLoans = loanId === "all" ? [...loans] : loans.filter(l => l.id === loanId);
+    const stdResult = simulateMultiLoanPayoff(stdLoans, 0, "standard");
+
+    const monthsSaved   = stdResult.totalMonths - result.totalMonths;
+    const interestSaved = stdResult.totalInterest - result.totalInterest;
+    const payoffDate    = monthsToDate(result.totalMonths);
+    const basePayment   = targetLoans.reduce((s, l) => s + (parseFloat(l.monthlyPayment)||0), 0);
+
+    // Render results
+    resEl.innerHTML = `
+      <div class="result-item">
+        <div class="result-label">Monthly Payment</div>
+        <div class="result-value big green">${fmtDec(basePayment + extra)}</div>
+        <div class="result-sub">Base: ${fmtDec(basePayment)}${extra > 0 ? ' + ' + currencySymbol + extra + ' extra' : ''}</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Total Interest</div>
+        <div class="result-value amber">${fmt(Math.round(result.totalInterest))}</div>
+        <div class="result-sub">Standard: ${fmt(Math.round(stdResult.totalInterest))}</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Payoff Date</div>
+        <div class="result-value white" style="font-size:18px;">${payoffDate}</div>
+        <div class="result-sub">${result.totalMonths} months · ${strat} order</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">vs Standard</div>
+        <div class="result-value ${interestSaved > 0 ? 'green' : 'muted'}" style="font-size:18px;">
+          ${interestSaved > 0 ? '-'+fmt(Math.round(interestSaved)) : interestSaved < 0 ? '+'+fmt(Math.round(Math.abs(interestSaved))) : 'Same'}
+        </div>
+        <div class="result-sub">${monthsSaved > 0 ? monthsSaved+' months earlier' : monthsSaved < 0 ? Math.abs(monthsSaved)+' months later' : 'Same timeline'}</div>
+      </div>
+    `;
+
+    // Draw chart using the combined balance schedule
+    drawLineChart(stdResult.combinedSchedule, result.combinedSchedule, result.startingBalance, extra);
+
+  } catch (e) {
+    console.error("runPlanner failed:", e);
+    const resEl = document.getElementById("plannerResults");
+    if (resEl) resEl.innerHTML = '<div class="result-item"><div class="result-label">Error</div><div class="result-value amber">—</div><div class="result-sub">Unable to run. Refresh page.</div></div>';
+  }
+}
+
+function monthsToDate(months) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SVG LINE CHART
+// ═══════════════════════════════════════════════════════════════════
+
+function drawLineChart(stdSchedule, extSchedule, maxBalance, extra) {
+  const svg = document.getElementById("plannerChart");
+  if (!svg) return;
+  svg.innerHTML = "";
+
+  const W = 600, H = 220;
+  const PAD = { top: 16, right: 24, bottom: 36, left: 56 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  // Guard: no data or all-zero balances
+  if (!stdSchedule || stdSchedule.length < 2) {
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", W / 2); t.setAttribute("y", H / 2);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("fill", "rgba(74,222,128,0.4)");
+    t.setAttribute("font-size", "12");
+    t.setAttribute("font-family", "DM Sans, sans-serif");
+    t.textContent = "No data";
+    svg.appendChild(t);
+    return;
+  }
+
+  const safeMaxBalance = maxBalance > 0 ? maxBalance : 1;
+  const maxMonths      = Math.max(stdSchedule.length, extSchedule.length);
+  const safeMaxMonths  = maxMonths > 1 ? maxMonths : 2;
+
+  // Clamp SVG coordinates to valid range
+  function xPos(month) {
+    const v = PAD.left + (month / (safeMaxMonths - 1)) * cW;
+    return Math.max(0, Math.min(W, isFinite(v) ? v : 0));
+  }
+  function yPos(bal) {
+    const v = PAD.top + cH - (bal / safeMaxBalance) * cH;
+    return Math.max(0, Math.min(H, isFinite(v) ? v : PAD.top + cH));
+  }
+
+  // Grid lines & Y labels
+  const steps = 5;
+  for (let i = 0; i <= steps; i++) {
+    const y = PAD.top + (cH / steps) * i;
+    const val = maxBalance - (maxBalance / steps) * i;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", PAD.left); line.setAttribute("x2", W - PAD.right);
+    line.setAttribute("y1", y); line.setAttribute("y2", y);
+    line.setAttribute("stroke", "rgba(34,197,94,0.07)");
+    line.setAttribute("stroke-width", "1");
+    svg.appendChild(line);
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", PAD.left - 6);
+    label.setAttribute("y", y + 4);
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("fill", "rgba(74,222,128,0.4)");
+    label.setAttribute("font-size", "10");
+    label.setAttribute("font-family", "DM Mono, monospace");
+    label.textContent = "$" + fmtK(val);
+    svg.appendChild(label);
+  }
+
+  // X-axis labels (years)
+  const yearStep = Math.ceil(maxMonths / 12 / 5);
+  for (let yr = 0; yr * 12 * yearStep < maxMonths; yr++) {
+    const month = yr * 12 * yearStep;
+    if (month >= maxMonths) break;
+    const x = xPos(month);
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", x);
+    label.setAttribute("y", H - PAD.bottom + 16);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("fill", "rgba(74,222,128,0.4)");
+    label.setAttribute("font-size", "10");
+    label.setAttribute("font-family", "DM Mono, monospace");
+    label.textContent = "Yr " + (yr * yearStep);
+    svg.appendChild(label);
+  }
+
+  function buildPath(schedule, step) {
+    const points = [];
+    for (let i = 0; i < schedule.length; i += step) {
+      const pt = schedule[i];
+      points.push(`${xPos(pt.month)},${yPos(pt.balance)}`);
+    }
+    // always include last point
+    const last = schedule[schedule.length - 1];
+    points.push(`${xPos(last.month)},${yPos(last.balance)}`);
+    return points.join(" ");
+  }
+
+  const step = Math.max(1, Math.floor(maxMonths / 120));
+
+  // Standard line (amber/muted)
+  const polyStd = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  polyStd.setAttribute("points", buildPath(stdSchedule, step));
+  polyStd.setAttribute("fill", "none");
+  polyStd.setAttribute("stroke", "rgba(245,158,11,0.5)");
+  polyStd.setAttribute("stroke-width", "2");
+  polyStd.setAttribute("stroke-dasharray", "5,3");
+  svg.appendChild(polyStd);
+
+  // Extra payment line (green)
+  if (extra > 0) {
+    const polyExt = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyExt.setAttribute("points", buildPath(extSchedule, step));
+    polyExt.setAttribute("fill", "none");
+    polyExt.setAttribute("stroke", "rgba(34,197,94,0.9)");
+    polyExt.setAttribute("stroke-width", "2.5");
+    svg.appendChild(polyExt);
+  } else {
+    // Show single green line
+    const polyMain = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyMain.setAttribute("points", buildPath(stdSchedule, step));
+    polyMain.setAttribute("fill", "none");
+    polyMain.setAttribute("stroke", "rgba(34,197,94,0.85)");
+    polyMain.setAttribute("stroke-width", "2.5");
+    svg.appendChild(polyMain);
+    // Remove amber line if same
+    svg.removeChild(polyStd);
+  }
+
+  // Legend
+  if (extra > 0) {
+    const lg1 = makeLegendItem(W - PAD.right - 160, 8, "rgba(245,158,11,0.7)", "Standard", true);
+    const lg2 = makeLegendItem(W - PAD.right - 70, 8, "rgba(34,197,94,0.9)", "With Extra", false);
+    svg.appendChild(lg1);
+    svg.appendChild(lg2);
+  }
+}
+
+function makeLegendItem(x, y, color, label, dashed) {
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x); line.setAttribute("x2", x + 18);
+  line.setAttribute("y1", y + 5); line.setAttribute("y2", y + 5);
+  line.setAttribute("stroke", color); line.setAttribute("stroke-width", "2");
+  if (dashed) line.setAttribute("stroke-dasharray", "4,2");
+  const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  text.setAttribute("x", x + 22); text.setAttribute("y", y + 9);
+  text.setAttribute("fill", "rgba(134,239,172,0.7)");
+  text.setAttribute("font-size", "10");
+  text.setAttribute("font-family", "DM Sans, sans-serif");
+  text.textContent = label;
+  g.appendChild(line);
+  g.appendChild(text);
+  return g;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOAN WARNINGS
+// ═══════════════════════════════════════════════════════════════════
+
+function getLoanWarnings(loan) {
+  if (!loan) return [];
+  const warnings   = [];
+  const rate        = parseFloat(loan.rate)         || 0;
+  const principal   = parseFloat(loan.principal)    || 0;
+  const balance     = parseFloat(loan.balance)      || 0;
+  const termMonths  = parseInt(loan.termMonths)     || 0;
+  const monthly     = parseFloat(loan.monthlyPayment)|| 0;
+
+  if (rate > 15) warnings.push({ level: 'danger',  msg: 'Very high rate — refinancing recommended' });
+  else if (rate > 10) warnings.push({ level: 'caution', msg: 'High rate — explore refinancing' });
+
+  // Guard division by zero
+  if (principal > 0) {
+    const pctPaid = (principal - balance) / principal;
+    if (pctPaid < 0.05 && termMonths > 60) warnings.push({ level: 'info', msg: 'Minimal progress — consider extra payments' });
+
+    const totalCost     = monthly * termMonths;
+    const interestRatio = (totalCost - principal) / principal;
+    if (isFinite(interestRatio) && interestRatio > 0.5) {
+      warnings.push({ level: 'caution', msg: `Interest exceeds 50% of principal ($${Math.round(totalCost - principal).toLocaleString()} total interest)` });
+    }
+  }
+
+  if (balance > principal && principal > 0) warnings.push({ level: 'danger', msg: 'Balance exceeds principal — possible negative amortization' });
+  if (rate === 0) warnings.push({ level: 'info', msg: '0% interest — verify this is correct' });
+
+  return warnings;
+}
+
+function renderWarningBadges(loan) {
+  const warnings = getLoanWarnings(loan);
+  if (!warnings.length) return '';
+  const icons = { danger: '⚠', caution: '⚠', info: 'ℹ' };
+  return `<div class="loan-warnings">${warnings.map(w =>
+    `<span class="warn-badge ${w.level}">${icons[w.level]} ${w.msg}</span>`
+  ).join('')}</div>`;
+}
+
+// ─── Rate warning on Add Loan form ───
+function checkRateWarning(val) {
+  const box = document.getElementById('rateWarningBox');
+  if (!box) return;
+  const rate = parseFloat(val);
+  if (isNaN(rate) || val === '') {
+    box.style.display = 'none';
+    return;
+  }
+  if (rate > 25) {
+    box.className = 'rate-warning-box critical';
+    box.textContent = '🚨 Predatory rate territory. Seek financial counseling.';
+    box.style.display = 'block';
+  } else if (rate > 15) {
+    box.className = 'rate-warning-box danger';
+    box.textContent = '⚠ This is a very high interest rate. Consider negotiating or finding alternatives.';
+    box.style.display = 'block';
+  } else if (rate > 10) {
+    box.className = 'rate-warning-box caution';
+    box.textContent = '⚠ Above average — compare with other lenders before accepting.';
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DEBT HEALTH SCORE
+// ═══════════════════════════════════════════════════════════════════
+
+function calcHealthScore(loanList) {
+  if (!loanList || !loanList.length) return 100;
+  let score = 100;
+  loanList.forEach(l => {
+    const rate      = parseFloat(l.rate)      || 0;
+    const principal = parseFloat(l.principal) || 0;
+    const balance   = parseFloat(l.balance)   || 0;
+    if (rate > 15) score -= 20;
+    else if (rate > 10) score -= 10;
+    else if (rate > 7)  score -= 5;
+    // Guard division by zero
+    if (principal > 0) {
+      const pct = (principal - balance) / principal;
+      if (pct < 0.1) score -= 5;
+    }
+  });
+  if (loanList.length > 4) score -= 10;
+  return Math.max(0, Math.min(100, score));
+}
+
+function renderHealthScore() {
+  const wrap = document.getElementById('healthScoreWrap');
+  if (!wrap) return;
+  const score = calcHealthScore(loans);
+
+  let color, label;
+  if (score <= 40)      { color = '#EF4444'; label = 'At Risk'; }
+  else if (score <= 70) { color = '#F59E0B'; label = 'Needs Attention'; }
+  else if (score <= 90) { color = '#22C55E'; label = 'Good'; }
+  else                  { color = '#4ADE80'; label = 'Excellent'; }
+
+  const R = 28, cx = 34, cy = 34;
+  const circumference = 2 * Math.PI * R;
+  const dash = (score / 100) * circumference;
+  const gap  = circumference - dash;
+
+  wrap.innerHTML = `
+    <svg class="health-ring-svg" width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${color}" stroke-width="6"
+        stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+        stroke-linecap="round"
+        transform="rotate(-90 ${cx} ${cy})"
+        style="transition:stroke-dasharray 0.6s ease;"/>
+      <text x="${cx}" y="${cy + 5}" text-anchor="middle" fill="${color}" font-size="13" font-weight="700" font-family="DM Mono, monospace">${score}</text>
+    </svg>
+    <div>
+      <div class="health-score-label" style="color:${color}">${label}</div>
+      <div class="summary-sub" style="margin-top:4px;">out of 100</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SMART RECOMMENDATIONS
+// ═══════════════════════════════════════════════════════════════════
+
+function generateRecommendations(loanList) {
+  const recs = [];
+
+  const highestRate = [...loanList].sort((a,b) => b.rate - a.rate)[0];
+  if (highestRate && highestRate.rate > 8) {
+    recs.push({
+      priority: 'high',
+      icon: '↑',
+      title: 'Target High-Interest Debt First',
+      detail: `Your ${highestRate.label} at ${highestRate.rate}% is costing you the most. Paying an extra $50/month saves ~$${Math.round(highestRate.rate * highestRate.balance * 0.15).toLocaleString()} in interest.`,
+      action: 'Run Avalanche Simulation',
+      actionView: 'planner'
+    });
+  }
+
+  const smallest = [...loanList].sort((a,b) => a.balance - b.balance)[0];
+  if (smallest && loanList.length > 1) {
+    recs.push({
+      priority: 'medium',
+      icon: '✓',
+      title: 'Quick Win Available',
+      detail: `You're only ${fmt(smallest.balance)} away from eliminating your ${smallest.label}. Paying it off frees ${fmtDec(smallest.monthlyPayment)}/month.`,
+      action: 'View Snowball Plan',
+      actionView: 'planner'
+    });
+  }
+
+  const refiCandidate = loanList.find(l => l.rate > 7);
+  if (refiCandidate) {
+    const saving = refiCandidate.monthlyPayment - calcMonthlyPayment(refiCandidate.balance, refiCandidate.rate - 2, refiCandidate.termMonths);
+    if (saving > 20) {
+      recs.push({
+        priority: 'medium',
+        icon: '$',
+        title: 'Refinancing Could Save You Money',
+        detail: `If you refinance your ${refiCandidate.label} at a rate 2% lower, you could save ~${fmtDec(saving)}/month.`,
+        action: 'Learn About Refinancing',
+        actionView: null
+      });
+    }
+  }
+
+  const totalBalance = loanList.reduce((s,l) => s + l.balance, 0);
+  if (totalBalance > 20000) {
+    recs.push({
+      priority: 'low',
+      icon: '+',
+      title: 'Extra ' + (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + '100/Month Makes a Big Difference',
+      detail: `With ${fmt(totalBalance)} in total debt, adding ` + (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + `100/month to your highest-rate loan accelerates payoff significantly.`,
+      action: 'Try Extra Payment Simulator',
+      actionView: 'planner'
+    });
+  }
+
+  return recs;
+}
+
+function renderRecommendations() {
+  const container = document.getElementById('recsContainer');
+  if (!container) return;
+
+  const recs = generateRecommendations(loans);
+
+  if (!recs.length) {
+    container.innerHTML = `<div class="recs-healthy">✓ Your loan profile looks healthy! Keep making on-time payments.</div>`;
+    return;
+  }
+
+  const priorityIconClass = { high: 'high', medium: 'medium', low: 'low' };
+
+  container.innerHTML = `<div class="recs-scroll">${recs.map(rec => {
+    const actionBtn = rec.action
+      ? `<button class="rec-action-btn" onclick="${rec.actionView ? `navigateTo('${rec.actionView}')` : ''}">${rec.action}</button>`
+      : '';
+    return `
+      <div class="rec-card priority-${rec.priority}">
+        <div class="rec-card-header">
+          <div class="rec-icon-circle ${priorityIconClass[rec.priority]}">${rec.icon}</div>
+          <div class="rec-title">${rec.title}</div>
+        </div>
+        <div class="rec-detail">${rec.detail}</div>
+        ${actionBtn}
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════════════════════════════
+
+function fmt(n) {
+  const v = parseFloat(n);
+  if (!isFinite(v)) return (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + "0";
+  return (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+}
+
+function fmtDec(n) {
+  const v = parseFloat(n);
+  if (!isFinite(v)) return (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + "0.00";
+  return (typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtK(n) {
+  const v = parseFloat(n);
+  if (!isFinite(v)) return "0";
+  if (v >= 1000) return (v / 1000).toFixed(0) + "k";
+  return Math.round(v).toString();
+}
+
+function capitalize(str) {
+  if (!str) return "";
+  return String(str).charAt(0).toUpperCase() + String(str).slice(1);
+}
+
+// XSS prevention: escape user-supplied strings before innerHTML injection
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Strip any non-numeric characters (except decimal point and minus) from number inputs
+function sanitizeNumericInput(input) {
+  if (!input) return;
+  const val = input.value;
+  // Allow digits, one decimal point, optional leading minus
+  const clean = val.replace(/[^0-9.]/g, "");
+  if (clean !== val) input.value = clean;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — STATE
+// ═══════════════════════════════════════════════════════════════════
+
+let userProfile = { name: 'Alex Rivera', role: 'Recent Graduate', email: 'alex@example.com' };
+let userSettings = { paymentReminders: true, milestoneAlerts: true, weeklySummary: true };
+let currencySymbol = '$';
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — RENDER
+// ═══════════════════════════════════════════════════════════════════
+
+function renderSettingsView() {
+  const container = document.getElementById('settings-content');
+  if (!container) return;
+
+  const initials = getInitials(userProfile.name);
+
+  container.innerHTML = `
+    <!-- Profile Section -->
+    <div class="card settings-section" style="margin-bottom:14px;">
+      <div class="settings-title">Profile</div>
+
+      <!-- Avatar -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green-dim),#0a2e12);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--green);flex-shrink:0;">${escapeHtml(initials)}</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text-primary);">${escapeHtml(userProfile.name)}</div>
+          <div style="font-size:12px;color:var(--text-muted);">${escapeHtml(userProfile.role)}</div>
+        </div>
+      </div>
+
+      <!-- Name row -->
+      <div class="settings-row">
+        <div style="flex:1;min-width:0;">
+          <div class="settings-row-label">Name</div>
+          <div id="profile-name-display" class="edit-row">
+            <span class="settings-row-sub" id="profile-name-val">${escapeHtml(userProfile.name)}</span>
+            <button class="btn-edit" onclick="startEditProfile('name')">Edit</button>
+          </div>
+          <div id="profile-name-edit" style="display:none;" class="edit-row">
+            <input class="edit-input" id="input-profile-name" type="text" value="${escapeHtml(userProfile.name)}" maxlength="60" style="width:200px;" />
+            <button class="btn-save" onclick="saveProfile('name')">Save</button>
+            <button class="btn-cancel-sm" onclick="cancelEditProfile('name')">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role row -->
+      <div class="settings-row">
+        <div style="flex:1;min-width:0;">
+          <div class="settings-row-label">Role</div>
+          <div id="profile-role-display" class="edit-row">
+            <span class="settings-row-sub" id="profile-role-val">${escapeHtml(userProfile.role)}</span>
+            <button class="btn-edit" onclick="startEditProfile('role')">Edit</button>
+          </div>
+          <div id="profile-role-edit" style="display:none;" class="edit-row">
+            <select class="edit-input" id="input-profile-role">
+              <option value="Recent Graduate"${userProfile.role==='Recent Graduate'?' selected':''}>Recent Graduate</option>
+              <option value="Student"${userProfile.role==='Student'?' selected':''}>Student</option>
+              <option value="Working Professional"${userProfile.role==='Working Professional'?' selected':''}>Working Professional</option>
+              <option value="Other"${userProfile.role==='Other'?' selected':''}>Other</option>
+            </select>
+            <button class="btn-save" onclick="saveProfile('role')">Save</button>
+            <button class="btn-cancel-sm" onclick="cancelEditProfile('role')">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email row -->
+      <div class="settings-row">
+        <div style="flex:1;min-width:0;">
+          <div class="settings-row-label">Email</div>
+          <div id="profile-email-display" class="edit-row">
+            <span class="settings-row-sub" id="profile-email-val">${escapeHtml(userProfile.email)}</span>
+            <button class="btn-edit" onclick="startEditProfile('email')">Edit</button>
+          </div>
+          <div id="profile-email-edit" style="display:none;" class="edit-row">
+            <input class="edit-input" id="input-profile-email" type="email" value="${escapeHtml(userProfile.email)}" maxlength="120" style="width:220px;" />
+            <button class="btn-save" onclick="saveProfile('email')">Save</button>
+            <button class="btn-cancel-sm" onclick="cancelEditProfile('email')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="card settings-section" style="margin-bottom:14px;">
+      <div class="settings-title">Notifications</div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Payment reminders</div>
+          <div class="settings-row-sub">3 days before due date</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-paymentReminders" ${userSettings.paymentReminders ? 'checked' : ''} onchange="toggleSetting('paymentReminders')" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Milestone alerts</div>
+          <div class="settings-row-sub">Celebrate your wins</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-milestoneAlerts" ${userSettings.milestoneAlerts ? 'checked' : ''} onchange="toggleSetting('milestoneAlerts')" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Weekly summary email</div>
+          <div class="settings-row-sub">Every Monday morning</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-weeklySummary" ${userSettings.weeklySummary ? 'checked' : ''} onchange="toggleSetting('weeklySummary')" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Display Section -->
+    <div class="card settings-section" style="margin-bottom:14px;">
+      <div class="settings-title">Display</div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Default view</div>
+          <div class="settings-row-sub">Choose your preferred dashboard</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <select class="edit-input" id="display-view-select" onchange="saveDisplayViewPref(this.value)" style="min-width:170px;">
+            <option value="simple">Simple Dashboard</option>
+            <option value="advanced">Advanced Dashboard</option>
+          </select>
+          <a href="dashboard-advanced.html" class="btn-edit" style="text-decoration:none;white-space:nowrap;">Go to Advanced Mode</a>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Currency display</div>
+          <div class="settings-row-sub">Symbol used throughout the dashboard</div>
+        </div>
+        <select class="edit-input" id="currency-select" onchange="saveCurrencyPref(this.value)">
+          <option value="$"${currencySymbol==='$'?' selected':''}>USD ($)</option>
+          <option value="\u20AC"${currencySymbol==='\u20AC'?' selected':''}>EUR (\u20AC)</option>
+          <option value="\u00A3"${currencySymbol==='\u00A3'?' selected':''}>GBP (\u00A3)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Account Section -->
+    <div class="card settings-section" style="margin-bottom:14px;">
+      <div class="settings-title">Account</div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Plan</div>
+          <div class="settings-row-sub">Free \u2014 LifeLaunch Basic</div>
+        </div>
+        <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="showUpgradeModal()">Upgrade</button>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <div>
+            <div class="settings-row-label">Password</div>
+            <div class="settings-row-sub">Update your account password</div>
+          </div>
+          <button class="btn-edit" onclick="toggleChangePassword()">Change Password</button>
+        </div>
+        <div id="change-password-form" style="display:none;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">Current Password</div>
+              <input class="edit-input" id="pw-current" type="password" placeholder="Current password" style="width:100%;max-width:280px;" />
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">New Password</div>
+              <input class="edit-input" id="pw-new" type="password" placeholder="Min 8 characters" style="width:100%;max-width:280px;" />
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">Confirm New Password</div>
+              <input class="edit-input" id="pw-confirm" type="password" placeholder="Repeat new password" style="width:100%;max-width:280px;" />
+            </div>
+            <div id="pw-error" style="display:none;color:#F59E0B;font-size:12px;"></div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-save" onclick="savePassword()">Save Password</button>
+              <button class="btn-cancel-sm" onclick="toggleChangePassword()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign Out -->
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Session</div>
+          <div class="settings-row-sub">Sign out of your account</div>
+        </div>
+        <button class="btn-ghost" style="font-size:12px;padding:6px 14px;" onclick="signOut()">Sign Out</button>
+      </div>
+
+      <!-- Delete Account -->
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Delete Account</div>
+          <div class="settings-row-sub">Permanently remove your account and data</div>
+        </div>
+        <button class="btn-danger" onclick="showDeleteAccountModal()">Delete Account</button>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card settings-section danger-section" style="margin-bottom:14px;">
+      <div class="settings-title" style="color:#EF4444;border-bottom-color:rgba(239,68,68,0.2);">Danger Zone</div>
+
+      <!-- Export Data -->
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Export Loan Data</div>
+          <div class="settings-row-sub">Download your loans as a JSON file</div>
+        </div>
+        <button class="btn-ghost" style="font-size:12px;padding:6px 14px;" onclick="exportLoansData()">Export Data</button>
+      </div>
+
+      <!-- Clear All Loans -->
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <div>
+            <div class="settings-row-label">Clear All Loans</div>
+            <div class="settings-row-sub">Remove every loan from your account</div>
+          </div>
+          <button class="btn-danger" id="clear-loans-btn" onclick="promptClearLoans()">Clear All Loans</button>
+        </div>
+        <div id="clear-loans-confirm" style="display:none;width:100%;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;">
+          <div style="font-size:13px;color:#F87171;margin-bottom:10px;">This will permanently delete all your loans. Are you sure?</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-danger" onclick="clearAllLoans()">Yes, Delete All</button>
+            <button class="btn-cancel-sm" onclick="cancelClearLoans()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — PROFILE EDIT
+// ═══════════════════════════════════════════════════════════════════
+
+function getInitials(name) {
+  const parts = (name || '').trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (parts[0] || 'U').slice(0, 2).toUpperCase();
+}
+
+function startEditProfile(field) {
+  document.getElementById('profile-' + field + '-display').style.display = 'none';
+  document.getElementById('profile-' + field + '-edit').style.display = 'flex';
+  const input = document.getElementById('input-profile-' + field);
+  if (input) input.focus();
+}
+
+function cancelEditProfile(field) {
+  document.getElementById('profile-' + field + '-display').style.display = 'flex';
+  document.getElementById('profile-' + field + '-edit').style.display = 'none';
+}
+
+function saveProfile(field) {
+  const input = document.getElementById('input-profile-' + field);
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) { showSettingsToast('Field cannot be empty.', 'error'); return; }
+  userProfile[field] = val;
+
+  // Re-render the full settings view to update avatar/name/etc.
+  renderSettingsView();
+
+  // Update topbar greeting
+  setGreeting();
+
+  // Update sidebar user badge
+  updateSidebarUserBadge();
+
+  showSettingsToast('Profile updated!');
+}
+
+function updateSidebarUserBadge() {
+  const nameEl   = document.querySelector('.user-name');
+  const roleEl   = document.querySelector('.user-role');
+  const avatarEl = document.querySelector('.avatar');
+  if (nameEl)   nameEl.textContent   = userProfile.name;
+  if (roleEl)   roleEl.textContent   = userProfile.role;
+  if (avatarEl) avatarEl.textContent = getInitials(userProfile.name);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — NOTIFICATIONS TOGGLES
+// ═══════════════════════════════════════════════════════════════════
+
+function toggleSetting(key) {
+  userSettings[key] = !userSettings[key];
+  const state = userSettings[key];
+  const labels = {
+    paymentReminders: 'Payment reminders',
+    milestoneAlerts:  'Milestone alerts',
+    weeklySummary:    'Weekly summary email'
+  };
+  showSettingsToast((labels[key] || key) + (state ? ' enabled' : ' disabled'));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — DISPLAY PREFERENCES
+// ═══════════════════════════════════════════════════════════════════
+
+function saveDisplayViewPref(val) {
+  showSettingsToast('Display preference saved.');
+}
+
+function saveCurrencyPref(symbol) {
+  currencySymbol = symbol;
+  renderDashboardSummary();
+  renderDashLoanList();
+  renderDashPayments();
+  renderLoansFullTable();
+  runPlanner();
+  showSettingsToast('Currency updated to ' + symbol);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — UPGRADE MODAL
+// ═══════════════════════════════════════════════════════════════════
+
+function showUpgradeModal() {
+  const plans = [
+    { name: 'Free',  price: '$0/mo',  features: ['3 loans','Basic dashboard','Repayment planner','Milestones'], current: true },
+    { name: 'Pro',   price: '$9/mo',  features: ['Unlimited loans','Advanced dashboard','AI recommendations','Priority support','Export data'], current: false },
+    { name: 'Team',  price: '$29/mo', features: ['Everything in Pro','Up to 5 users','Shared loan tracking','Team milestones','Admin controls'], current: false }
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'upgrade-modal';
+
+  const cardsHtml = plans.map(plan => {
+    const borderColor = plan.current ? 'var(--green)' : 'var(--border)';
+    const nameColor   = plan.current ? 'var(--green)'  : 'var(--text-primary)';
+    const currentBadge = plan.current ? ' <span style="font-size:10px;background:var(--green);color:#000;padding:2px 6px;border-radius:10px;font-weight:700;vertical-align:middle;">Current</span>' : '';
+    const featureItems = plan.features.map(f =>
+      '<li style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;margin-bottom:4px;"><span style="color:var(--green);font-weight:700;">&#10003;</span>' + escapeHtml(f) + '</li>'
+    ).join('');
+    const btnOpacity = plan.current ? 'opacity:0.5;cursor:default;' : '';
+    const btnLabel   = plan.current ? 'Current Plan' : 'Select Plan';
+    return '<div style="background:var(--surface2);border:1px solid ' + borderColor + ';border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">' +
+      '<div style="font-family:\'Syne\',sans-serif;font-size:15px;font-weight:700;color:' + nameColor + ';">' + escapeHtml(plan.name) + currentBadge + '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:20px;font-weight:500;color:var(--text-primary);">' + escapeHtml(plan.price) + '</div>' +
+      '<ul style="list-style:none;padding:0;flex:1;">' + featureItems + '</ul>' +
+      '<button class="btn-primary" style="font-size:12px;padding:7px 10px;' + btnOpacity + '" onclick="showSettingsToast(\'Plan upgrade coming soon!\');closeModal(\'upgrade-modal\');">' + escapeHtml(btnLabel) + '</button>' +
+      '</div>';
+  }).join('');
+
+  overlay.innerHTML =
+    '<div class="modal-box">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">' +
+        '<div style="font-family:\'Syne\',sans-serif;font-size:18px;font-weight:700;color:var(--text-primary);">Choose Your Plan</div>' +
+        '<button onclick="closeModal(\'upgrade-modal\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:22px;line-height:1;">&times;</button>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">' + cardsHtml + '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('upgrade-modal'); });
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — CHANGE PASSWORD
+// ═══════════════════════════════════════════════════════════════════
+
+function toggleChangePassword() {
+  const form = document.getElementById('change-password-form');
+  if (!form) return;
+  const isOpen = form.style.display !== 'none';
+  form.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    ['pw-current','pw-new','pw-confirm'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const err = document.getElementById('pw-error');
+    if (err) err.style.display = 'none';
+  }
+}
+
+function savePassword() {
+  const currentEl  = document.getElementById('pw-current');
+  const newEl      = document.getElementById('pw-new');
+  const confirmEl  = document.getElementById('pw-confirm');
+  const errEl      = document.getElementById('pw-error');
+
+  const current   = currentEl  ? currentEl.value  : '';
+  const newPw     = newEl      ? newEl.value      : '';
+  const confirmPw = confirmEl  ? confirmEl.value  : '';
+
+  function showPwErr(msg) {
+    if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+  }
+
+  if (!current) { showPwErr('Please enter your current password.'); return; }
+  if (newPw.length < 8) { showPwErr('New password must be at least 8 characters.'); return; }
+  if (newPw !== confirmPw) { showPwErr('New passwords do not match.'); return; }
+
+  if (errEl) errEl.style.display = 'none';
+  toggleChangePassword();
+  showSettingsToast('Password updated!');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — SIGN OUT & DELETE ACCOUNT
+// ═══════════════════════════════════════════════════════════════════
+
+function signOut() {
+  try { localStorage.removeItem('ll_user'); } catch (_) {}
+  window.location.href = 'signin.html';
+}
+
+function showDeleteAccountModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'delete-account-modal';
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:380px;">' +
+      '<div style="font-family:\'Syne\',sans-serif;font-size:17px;font-weight:700;color:#F87171;margin-bottom:10px;">Delete Account</div>' +
+      '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.6;">Are you sure? This cannot be undone. All your loan data, milestones, and settings will be permanently deleted.</div>' +
+      '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+        '<button class="btn-cancel-sm" style="padding:8px 16px;" onclick="closeModal(\'delete-account-modal\')">Cancel</button>' +
+        '<button class="btn-danger" style="padding:8px 16px;" onclick="requestDeleteAccount()">Delete Account</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal('delete-account-modal'); });
+}
+
+function requestDeleteAccount() {
+  closeModal('delete-account-modal');
+  showSettingsToast('Account deletion requested. You will receive a confirmation email.', 'info');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — DANGER ZONE
+// ═══════════════════════════════════════════════════════════════════
+
+function exportLoansData() {
+  try {
+    const blob = new Blob([JSON.stringify(loans, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lifelaunch-loans.json';
+    a.click();
+    showSettingsToast('Loan data exported!');
+  } catch (e) {
+    showSettingsToast('Export failed. Please try again.', 'error');
+  }
+}
+
+function promptClearLoans() {
+  const confirm = document.getElementById('clear-loans-confirm');
+  if (confirm) confirm.style.display = 'block';
+}
+
+function cancelClearLoans() {
+  const confirm = document.getElementById('clear-loans-confirm');
+  if (confirm) confirm.style.display = 'none';
+}
+
+function clearAllLoans() {
+  loans = [];
+  renderLoansFullTable();
+  renderDashboardSummary();
+  renderDashLoanList();
+  renderDashPayments();
+  renderDashMilestoneCallout();
+  updatePlannerSelect();
+  runPlanner();
+  renderRecommendations();
+  renderDashStrategy(document.querySelector('.strategy-tab.active')?.dataset?.strat || 'snowball');
+  cancelClearLoans();
+  showSettingsToast('All loans cleared.');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS — TOAST
+// ═══════════════════════════════════════════════════════════════════
+
+function showSettingsToast(msg, type) {
+  type = type || 'success';
+  var existing = document.getElementById('settings-toast');
+  if (existing) existing.remove();
+
+  var colors = {
+    success: { bg: 'rgba(34,197,94,0.15)',  border: 'rgba(34,197,94,0.35)',  text: '#4ADE80' },
+    error:   { bg: 'rgba(239,68,68,0.12)',  border: 'rgba(239,68,68,0.35)',  text: '#F87171' },
+    info:    { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.35)', text: '#60A5FA' }
+  };
+  var c = colors[type] || colors.success;
+
+  var toast = document.createElement('div');
+  toast.id = 'settings-toast';
+  toast.style.cssText =
+    'position:fixed;bottom:28px;right:28px;z-index:2000;' +
+    'background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';' +
+    'font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:500;' +
+    'padding:10px 18px;border-radius:8px;' +
+    'box-shadow:0 4px 20px rgba(0,0,0,0.4);' +
+    'animation:fadeIn 0.2s ease;' +
+    'max-width:320px;';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(function() { if (toast.parentNode) toast.remove(); }, 3000);
+}
+</script>
+</body>
+</html>

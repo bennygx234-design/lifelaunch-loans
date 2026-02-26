@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LifeLaunch — Advanced Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #070C08;
+  --bg2: #0A100B;
+  --surface: #0D160F;
+  --surface2: #111A12;
+  --panel-border: rgba(34,197,94,0.15);
+  --panel-border-h: rgba(34,197,94,0.30);
+  --green: #22C55E;
+  --green-dim: #16A34A;
+  --green-glow: rgba(34,197,94,0.08);
+  --red: #EF4444;
+  --amber: #F59E0B;
+  --text-primary: #E8F5E9;
+  --text-secondary: #81C784;
+  --text-muted: rgba(76,175,80,0.4);
+  --text-dim: rgba(46,125,50,0.6);
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
+  --sidebar-w: 200px;
+  --topbar-h: 40px;
+  --ticker-h: 32px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: var(--topbar-h) 1fr var(--ticker-h);
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar main"
+    "ticker ticker";
+  transition: grid-template-columns 0.25s ease;
+}
+body.sidebar-collapsed {
+  --sidebar-w: 40px;
+  grid-template-columns: 40px 1fr;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
+svg { display: block; }
+
+/* ═══════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════ */
+#topbar {
+  grid-area: topbar;
+  background: var(--surface);
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 8px;
+  height: var(--topbar-h);
+  z-index: 100;
+  overflow: hidden;
+}
+.tb-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 10px;
+  border-right: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.tb-logo-icon {
+  width: 22px;
+  height: 22px;
+  background: var(--green);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tb-logo-text {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+}
+.tb-loan-filters {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 10px;
+  border-right: 1px solid var(--panel-border);
+}
+.tb-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.tb-pill:hover { border-color: var(--green); color: var(--green); }
+.tb-pill.active { background: var(--green); color: #000; border-color: var(--green); font-weight: 700; }
+.tb-strategy {
+  padding: 0 10px;
+  border-right: 1px solid var(--panel-border);
+}
+.tb-strategy select {
+  background: var(--surface2);
+  color: var(--text-primary);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  cursor: pointer;
+  outline: none;
+}
+.tb-strategy select:focus { border-color: var(--green); }
+.tb-spacer { flex: 1; }
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tb-simple-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border: 1px solid var(--green-dim);
+  border-radius: 4px;
+  color: var(--green);
+  background: transparent;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+}
+.tb-simple-btn:hover { background: var(--green); color: #000; }
+.tb-notif {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.tb-notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--red);
+  border-radius: 50%;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  color: #fff;
+  font-weight: 700;
+}
+.tb-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-dim), #064e3b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  border: 1px solid var(--panel-border);
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+#sidebar {
+  grid-area: sidebar;
+  background: var(--surface);
+  border-right: 1px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+.sb-nav { flex: 1; overflow-y: auto; padding: 6px 0; }
+.sb-nav::-webkit-scrollbar { width: 2px; }
+.sb-nav::-webkit-scrollbar-track { background: transparent; }
+.sb-nav::-webkit-scrollbar-thumb { background: var(--panel-border); }
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sb-item:hover { background: var(--green-glow); }
+.sb-item.active { background: rgba(34,197,94,0.12); border-left: 2px solid var(--green); }
+.sb-item.active .sb-label { color: var(--green); }
+.sb-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sb-item.active .sb-icon { color: var(--green); }
+.sb-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+body.sidebar-collapsed .sb-label { opacity: 0; pointer-events: none; }
+body.sidebar-collapsed .sb-item { padding: 8px; justify-content: center; }
+.sb-divider { height: 1px; background: var(--panel-border); margin: 4px 8px; }
+.sb-bottom {
+  padding: 8px;
+  border-top: 1px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sb-collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 4px 2px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sb-collapse-btn:hover { color: var(--text-secondary); }
+.sb-feedback-btn {
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 5px 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+  background: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sb-feedback-btn:hover { border-color: var(--green-dim); color: var(--text-secondary); }
+body.sidebar-collapsed .sb-feedback-btn { display: none; }
+body.sidebar-collapsed .sb-collapse-arrow { transform: rotate(180deg); }
+.sb-user-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px;
+  border-top: 1px solid var(--panel-border);
+  overflow: hidden;
+}
+.sb-user-av {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-dim), #064e3b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.sb-user-info { overflow: hidden; }
+.sb-user-name {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.sb-user-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(34,197,94,0.2);
+  color: var(--green);
+  letter-spacing: 0.05em;
+}
+body.sidebar-collapsed .sb-user-info { display: none; }
+body.sidebar-collapsed .sb-collapse-btn span { display: none; }
+
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════ */
+#main {
+  grid-area: main;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+  align-content: start;
+  background: var(--bg2);
+}
+#main::-webkit-scrollbar { width: 4px; }
+#main::-webkit-scrollbar-track { background: transparent; }
+#main::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 2px; }
+
+/* Row layouts */
+.row1 { display: grid; grid-template-columns: 25% 45% 30%; gap: 8px; }
+.row2 { display: grid; grid-template-columns: 70% 30%; gap: 8px; }
+.row3 { display: grid; grid-template-columns: 1fr; gap: 8px; }
+
+/* ── View switching ── */
+.view-section { display: none; padding: 8px; }
+.view-section.active { display: block; }
+/* Dashboard (default): show rows, hide view-sections and solo panels */
+body.dash-view .row1,
+body.dash-view .row2,
+body.dash-view .row3 { display: grid; }
+/* All non-dashboard views: hide the rows */
+body:not(.dash-view) .row1,
+body:not(.dash-view) .row2,
+body:not(.dash-view) .row3 { display: none !important; }
+/* solo panel base */
+.solo-panel { display: none; padding: 8px; }
+.solo-panel .panel { min-height: calc(100vh - 130px); }
+
+/* ═══════════════════════════════════════
+   PANEL BASE
+═══════════════════════════════════════ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.panel:hover { border-color: var(--panel-border-h); }
+.panel-header {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0 8px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.panel-header-spacer { flex: 1; }
+.panel-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel tabs */
+.panel-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.ptab {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: 1px solid transparent;
+  letter-spacing: 0.04em;
+  transition: all 0.12s;
+}
+.ptab:hover { color: var(--text-secondary); border-color: var(--panel-border); }
+.ptab.active { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
+
+/* Chip filters */
+.chip-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.12s;
+}
+.chip:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+.chip.active { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
+.chip.student { border-color: rgba(34,197,94,0.3); color: #4ade80; }
+.chip.student.active { background: rgba(34,197,94,0.2); }
+.chip.auto { border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+.chip.auto.active { background: rgba(245,158,11,0.1); }
+.chip.personal { border-color: rgba(239,68,68,0.3); color: #f87171; }
+.chip.personal.active { background: rgba(239,68,68,0.1); }
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.data-table th {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--bg2);
+  white-space: nowrap;
+}
+.data-table th:first-child { padding-left: 10px; }
+.data-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(34,197,94,0.06);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.data-table td:first-child { padding-left: 10px; }
+.data-table tr:hover td { background: rgba(34,197,94,0.04); }
+.data-table tr.totals td {
+  background: var(--surface2);
+  border-top: 1px solid var(--panel-border);
+  color: var(--green);
+  font-weight: 500;
+}
+.tbl-scroll { overflow-y: auto; flex: 1; }
+.tbl-scroll::-webkit-scrollbar { width: 3px; }
+.tbl-scroll::-webkit-scrollbar-track { background: transparent; }
+.tbl-scroll::-webkit-scrollbar-thumb { background: var(--panel-border); }
+
+/* Row type borders */
+.row-student td:first-child { border-left: 2px solid #22C55E; }
+.row-auto td:first-child { border-left: 2px solid #F59E0B; }
+.row-personal td:first-child { border-left: 2px solid #EF4444; }
+.row-green-tint td { background: rgba(34,197,94,0.04); }
+.row-amber-tint td { background: rgba(245,158,11,0.04); }
+
+/* Number styles */
+.num { font-family: var(--mono); }
+.num-green { color: var(--green); }
+.num-red { color: var(--red); }
+.num-amber { color: var(--amber); }
+.num-muted { color: var(--text-muted); }
+.num-dim { color: var(--text-dim); }
+
+/* Change indicators */
+.chg { display: inline-flex; align-items: center; gap: 2px; font-family: var(--mono); font-size: 10px; }
+.chg.up { color: var(--red); }
+.chg.down { color: var(--green); }
+.chg.flat { color: var(--text-muted); }
+
+/* Action buttons in tables */
+.tbl-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--panel-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.12s;
+  letter-spacing: 0.04em;
+}
+.tbl-btn:hover { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.08); }
+.tbl-btn.apply { border-color: rgba(34,197,94,0.4); color: var(--green); }
+.tbl-btn.apply:hover { background: var(--green); color: #000; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 8px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.badge-green { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.badge-red { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+/* Add button */
+.add-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 7px;
+  border: 1px solid rgba(34,197,94,0.4);
+  border-radius: 3px;
+  color: var(--green);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.12s;
+}
+.add-btn:hover { background: var(--green); color: #000; }
+
+/* Icon button */
+.icon-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.12s;
+  background: transparent;
+}
+.icon-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* ═══════════════════════════════════════
+   PANEL A — LOAN TRACKER
+═══════════════════════════════════════ */
+#panel-a .panel-body { overflow: hidden; }
+
+/* ═══════════════════════════════════════
+   PANEL B — REPAYMENT WINDOW
+═══════════════════════════════════════ */
+.extra-payment-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--panel-border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+.extra-payment-bar label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.extra-payment-bar input {
+  background: var(--surface2);
+  border: 1px solid var(--panel-border);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 6px;
+  width: 80px;
+  outline: none;
+}
+.extra-payment-bar input:focus { border-color: var(--green); }
+.extra-payment-bar button {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border: 1px solid var(--green-dim);
+  border-radius: 3px;
+  color: var(--green);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.extra-payment-bar button:hover { background: var(--green); color: #000; }
+.extra-result {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.extra-result .val { color: var(--green); font-weight: 500; }
+
+/* ═══════════════════════════════════════
+   PANEL C — MARKET RATES
+═══════════════════════════════════════ */
+.rate-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(34,197,94,0.06);
+  gap: 6px;
+}
+.rate-row:hover { background: rgba(34,197,94,0.04); }
+.rate-name { flex: 1; font-family: var(--sans); font-size: 11px; color: var(--text-primary); }
+.rate-val { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text-primary); width: 50px; text-align: right; }
+.rate-chg { width: 60px; text-align: right; font-family: var(--mono); font-size: 10px; }
+.stacked-bar-section {
+  padding: 8px;
+  border-top: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.stacked-bar-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stacked-bar-wrap {
+  display: flex;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+}
+.stacked-bar-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 8px; font-weight: 500; }
+.seg-student { background: rgba(34,197,94,0.5); color: #000; }
+.seg-auto { background: rgba(245,158,11,0.5); color: #000; }
+.seg-personal { background: rgba(239,68,68,0.5); color: #000; }
+.stacked-legend { display: flex; gap: 10px; margin-top: 5px; }
+.legend-item { display: flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 9px; color: var(--text-muted); }
+.legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════
+   PANEL D — REFI OPPORTUNITIES
+═══════════════════════════════════════ */
+.refi-highlight td { background: rgba(34,197,94,0.06) !important; }
+.refi-highlight td:first-child { border-left: 2px solid var(--green); }
+
+/* ═══════════════════════════════════════
+   PANEL E — BALANCE CHARTS
+═══════════════════════════════════════ */
+.chart-container { padding: 8px; flex: 1; min-height: 0; }
+.balance-bars-section { padding: 8px; border-top: 1px solid var(--panel-border); flex-shrink: 0; }
+.bal-bar-row { margin-bottom: 8px; }
+.bal-bar-label { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--text-secondary); margin-bottom: 2px; }
+.bal-bar-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--panel-border); }
+.bal-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+
+/* ═══════════════════════════════════════
+   PANEL F — CASH FLOW MAP
+═══════════════════════════════════════ */
+.cashflow-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+  padding: 8px;
+}
+.cashflow-cell {
+  background: var(--surface2);
+  border: 1px solid var(--panel-border);
+  border-radius: 3px;
+  padding: 5px 4px;
+  cursor: pointer;
+  transition: all 0.12s;
+  position: relative;
+}
+.cashflow-cell:hover { border-color: var(--green); z-index: 10; }
+.cashflow-cell.can-afford { border-color: rgba(34,197,94,0.25); }
+.cashflow-cell.can-afford .cf-amount { color: var(--green); }
+.cashflow-cell.tight { border-color: rgba(245,158,11,0.25); }
+.cashflow-cell.tight .cf-amount { color: var(--amber); }
+.cf-month { font-family: var(--mono); font-size: 8px; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.cf-amount { font-family: var(--mono); font-size: 10px; font-weight: 500; margin-top: 3px; }
+.cf-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  min-width: 130px;
+  z-index: 50;
+  pointer-events: none;
+}
+.cashflow-cell:hover .cf-tooltip { display: block; }
+.cf-tooltip-row { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 9px; color: var(--text-secondary); margin-bottom: 2px; }
+.cf-tooltip-row:last-child { margin-bottom: 0; }
+.cf-tooltip-row span:last-child { color: var(--text-primary); }
+
+/* ═══════════════════════════════════════
+   TICKER BAR
+═══════════════════════════════════════ */
+#ticker {
+  grid-area: ticker;
+  background: var(--surface);
+  border-top: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  height: var(--ticker-h);
+  z-index: 100;
+}
+.ticker-label {
+  background: var(--green);
+  color: #000;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 10px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.ticker-track { flex: 1; overflow: hidden; }
+.ticker-inner {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker-scroll 40s linear infinite;
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ticker-sep { color: var(--green); opacity: 0.5; }
+.ticker-item .hi { color: var(--green); }
+.ticker-item .warn { color: var(--amber); }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast-container {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+}
+.toast {
+  background: var(--surface2);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  min-width: 260px;
+  animation: toast-in 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.toast.success { border-color: rgba(34,197,94,0.4); }
+.toast-title { color: var(--green); font-weight: 500; margin-bottom: 2px; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════
+   METRIC TOGGLE
+═══════════════════════════════════════ */
+.metric-toggle {
+  display: flex;
+  gap: 2px;
+}
+.mtoggle {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.12s;
+}
+.mtoggle.active { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); }
+.mtoggle:hover { color: var(--text-secondary); }
+
+/* SVG chart line styles */
+.chart-axis line, .chart-axis path { stroke: var(--panel-border); }
+.chart-gridline { stroke: rgba(34,197,94,0.08); }
+.chart-line-1 { stroke: #22C55E; }
+.chart-line-2 { stroke: #F59E0B; }
+.chart-line-3 { stroke: #EF4444; }
+
+/* Tab content visibility */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.tab-content-flex { display: none; flex-direction: column; flex: 1; min-height: 0; }
+.tab-content-flex.active { display: flex; }
+
+/* ─── Inline rate warning badges for Panel A ─── */
+.rate-warn-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.rate-warn-badge.amber { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.rate-warn-badge.red   { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+/* ─── Alerts row in Panel A ─── */
+.panel-alerts-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(245,158,11,0.07);
+  border-top: 1px solid rgba(245,158,11,0.2);
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  background: var(--surface2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+/* ── LIGHT MODE OVERRIDES ── */
+body.light-mode {
+  --bg:             #F4F9F4;
+  --bg2:            #EBF5EB;
+  --surface:        #FFFFFF;
+  --surface2:       #E8F5E8;
+  --panel-border:   rgba(22,163,74,0.2);
+  --panel-border-h: rgba(22,163,74,0.35);
+  --green:          #16A34A;
+  --green-dim:      #15803D;
+  --green-glow:     rgba(22,163,74,0.12);
+  --text-primary:   #0F1F0F;
+  --text-secondary: #166534;
+  --text-muted:     rgba(22,101,52,0.6);
+  --text-dim:       rgba(22,101,52,0.5);
+  --amber:          #B45309;
+}
+body.light-mode { background: var(--bg); color: var(--text-primary); overflow: hidden; }
+
+body.light-mode #topbar { background: rgba(244,249,244,0.98) !important; border-bottom-color: rgba(22,163,74,0.15) !important; }
+
+body.light-mode #sidebar { background: #EBF5EB !important; border-right-color: rgba(22,163,74,0.15) !important; }
+
+body.light-mode #ticker { background: #EBF5EB !important; border-top-color: rgba(22,163,74,0.2) !important; }
+
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea {
+  background: #FFFFFF !important;
+  color: #0F1F0F !important;
+  border-color: rgba(22,163,74,0.3) !important;
+}
+body.light-mode input::placeholder { color: rgba(22,101,52,0.4) !important; }
+</style>
+</head>
+<body class="dash-view">
+
+<!-- ═══════════════════════════════════════
+     TOP BAR
+═══════════════════════════════════════ -->
+<div id="topbar">
+  <div class="tb-logo">
+    <div class="tb-logo-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L9.5 5H13L10 8.5L11 13L7 10.5L3 13L4 8.5L1 5H4.5L7 1Z" fill="#000" stroke="#000" stroke-width="0.5"/>
+      </svg>
+    </div>
+    <span class="tb-logo-text">LifeLaunch</span>
+  </div>
+  <div class="tb-loan-filters">
+    <button class="tb-pill active" data-filter="ALL" onclick="setLoanFilter('ALL',this)">ALL</button>
+    <button class="tb-pill" data-filter="STUDENT" onclick="setLoanFilter('STUDENT',this)">STUDENT</button>
+    <button class="tb-pill" data-filter="AUTO" onclick="setLoanFilter('AUTO',this)">AUTO</button>
+    <button class="tb-pill" data-filter="PERSONAL" onclick="setLoanFilter('PERSONAL',this)">PERSONAL</button>
+    <button class="tb-pill" data-filter="BUSINESS" onclick="setLoanFilter('BUSINESS',this)">BUSINESS</button>
+  </div>
+  <div class="tb-strategy">
+    <select id="global-strategy" onchange="onStrategyChange()">
+      <option value="avalanche">Avalanche Mode ▾</option>
+      <option value="snowball">Snowball Mode ▾</option>
+      <option value="standard">Standard Mode ▾</option>
+    </select>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="tb-right">
+    <a href="dashboard.html"><button class="tb-simple-btn">Simple Mode</button></a>
+    <div class="tb-notif">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span class="tb-notif-badge">3</span>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+    <div class="tb-avatar">BK</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<div id="sidebar">
+  <nav class="sb-nav">
+    <div class="sb-item active" onclick="navTo('dashboard',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+      </span>
+      <span class="sb-label">Dashboard</span>
+    </div>
+    <div class="sb-item" onclick="navTo('loantracker',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </span>
+      <span class="sb-label">Loan Tracker</span>
+    </div>
+    <div class="sb-item" onclick="navTo('pricingwindow',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </span>
+      <span class="sb-label">Pricing Window</span>
+    </div>
+    <div class="sb-item" onclick="navTo('liverates',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+        </svg>
+      </span>
+      <span class="sb-label">Live Rates</span>
+    </div>
+    <div class="sb-item" onclick="navTo('strategygrid',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+        </svg>
+      </span>
+      <span class="sb-label">Strategy Grid</span>
+    </div>
+    <div class="sb-item" onclick="navTo('lenderdata',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+        </svg>
+      </span>
+      <span class="sb-label">Country/Lender Data</span>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-item" onclick="navTo('arbspreads',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+        </svg>
+      </span>
+      <span class="sb-label">Arb Spreads</span>
+    </div>
+    <div class="sb-item" onclick="navTo('cashflowmap',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </span>
+      <span class="sb-label">Cash Flow Map</span>
+    </div>
+    <div class="sb-item" onclick="navTo('notifications',this)">
+      <span class="sb-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+      </span>
+      <span class="sb-label">Notifications</span>
+    </div>
+  </nav>
+  <div class="sb-bottom">
+    <button class="sb-collapse-btn" onclick="toggleSidebar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sb-collapse-arrow">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>Collapse Sidebar</span>
+    </button>
+    <button class="sb-feedback-btn">Help shape our platform — Feedback</button>
+    <div class="sb-user-card">
+      <div class="sb-user-av">BK</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">Ben K.</div>
+        <span class="sb-user-badge">PRO</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════ -->
+<div id="main">
+
+  <!-- ROW 1 -->
+  <div class="row1">
+
+    <!-- PANEL A: Loan Tracker -->
+    <div class="panel" id="panel-a">
+      <div class="panel-header">
+        <span class="panel-title">Loan Tracker</span>
+        <div style="display:flex;gap:3px;margin-left:4px;">
+          <span class="chip student active">Student</span>
+          <span class="chip auto active">Auto</span>
+          <span class="chip personal active">Personal</span>
+        </div>
+        <div class="panel-header-spacer"></div>
+        <button class="add-btn">+ Add</button>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>LOAN NAME</th>
+                <th>BAL</th>
+                <th>RATE</th>
+                <th>MONTHLY</th>
+                <th>CHG</th>
+              </tr>
+            </thead>
+            <tbody id="loan-tracker-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL B: Repayment Window -->
+    <div class="panel" id="panel-b">
+      <div class="panel-header">
+        <span class="panel-title">Repayment Window ↗</span>
+        <div class="panel-header-spacer"></div>
+        <button class="icon-btn" title="Export">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+        </button>
+      </div>
+      <div class="panel-tabs" id="repay-tabs">
+        <button class="ptab active" onclick="switchRepayTab('snowball',this)">Snowball</button>
+        <button class="ptab" onclick="switchRepayTab('avalanche',this)">Avalanche</button>
+        <button class="ptab" onclick="switchRepayTab('standard',this)">Standard</button>
+        <button class="ptab" onclick="switchRepayTab('custom',this)">Custom</button>
+      </div>
+      <div class="chip-row" id="repay-loan-chips">
+        <span class="chip active" data-loan="ALL" onclick="setRepayLoan('ALL',this)">ALL</span>
+        <span class="chip student active" data-loan="loan_1" onclick="setRepayLoan('loan_1',this)">Federal Student</span>
+        <span class="chip auto" data-loan="loan_2" onclick="setRepayLoan('loan_2',this)">Car Loan</span>
+        <span class="chip personal" data-loan="loan_3" onclick="setRepayLoan('loan_3',this)">Personal Loan</span>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-scroll" id="amort-table-wrap" style="flex:1;">
+          <table class="data-table" id="amort-table">
+            <thead>
+              <tr>
+                <th>MO</th>
+                <th>PAYMENT</th>
+                <th>PRINCIPAL</th>
+                <th>INTEREST</th>
+                <th>BALANCE</th>
+                <th>NOTE</th>
+              </tr>
+            </thead>
+            <tbody id="amort-tbody"></tbody>
+          </table>
+        </div>
+        <div class="extra-payment-bar">
+          <label>Extra/mo:</label>
+          <input type="number" id="extra-payment" placeholder="0.00" min="0" step="10" oninput="applyExtraPayment()"/>
+          <button onclick="applyExtraPayment()">Apply</button>
+          <span class="extra-result" id="extra-result"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL C: Market Rates -->
+    <div class="panel" id="panel-c">
+      <div class="panel-header">
+        <span class="panel-title">Market Rates ↗</span>
+        <div class="panel-header-spacer"></div>
+        <div class="metric-toggle">
+          <button class="mtoggle active" onclick="setMetric('APR',this)">APR</button>
+          <button class="mtoggle" onclick="setMetric('Monthly',this)">Monthly</button>
+          <button class="mtoggle" onclick="setMetric('Total',this)">Total</button>
+        </div>
+      </div>
+      <div class="panel-tabs" id="rates-tabs">
+        <button class="ptab active" onclick="switchRatesTab('federal',this)">Federal</button>
+        <button class="ptab" onclick="switchRatesTab('private',this)">Private</button>
+        <button class="ptab" onclick="switchRatesTab('auto',this)">Auto</button>
+        <button class="ptab" onclick="switchRatesTab('personal',this)">Personal</button>
+      </div>
+      <div class="panel-body" style="overflow-y:auto;">
+        <div id="rates-federal" class="tab-content active">
+          <div class="rate-row" data-rate-name="Federal Subsidized">
+            <span class="rate-name">Federal Subsidized</span>
+            <span class="rate-val rate-value num">5.50%</span>
+            <span class="rate-chg chg down">▼ -0.25</span>
+          </div>
+          <div class="rate-row" data-rate-name="Federal Unsubsidized">
+            <span class="rate-name">Federal Unsubsidized</span>
+            <span class="rate-val rate-value num">7.05%</span>
+            <span class="rate-chg chg up">▲ +0.10</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">PLUS (Graduate)</span>
+            <span class="rate-val num">8.05%</span>
+            <span class="rate-chg chg flat">— 0.00</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">PLUS (Parent)</span>
+            <span class="rate-val num">9.08%</span>
+            <span class="rate-chg chg up">▲ +0.05</span>
+            <span class="badge badge-amber">Refi Alert</span>
+          </div>
+        </div>
+        <div id="rates-private" class="tab-content">
+          <div class="rate-row" data-rate-name="Private Student">
+            <span class="rate-name">Private Student (Fixed)</span>
+            <span class="rate-val rate-value num">8.90%</span>
+            <span class="rate-chg chg flat">— 0.00</span>
+            <span class="badge badge-amber">Refi Alert</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Private Student (Var)</span>
+            <span class="rate-val num">7.40%</span>
+            <span class="rate-chg chg down">▼ -0.15</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">SoFi Refinance</span>
+            <span class="rate-val num">6.24%</span>
+            <span class="rate-chg chg down">▼ -0.20</span>
+            <span class="badge badge-green">Best Rate</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Earnest Refinance</span>
+            <span class="rate-val num">6.49%</span>
+            <span class="rate-chg chg flat">— 0.00</span>
+          </div>
+        </div>
+        <div id="rates-auto" class="tab-content">
+          <div class="rate-row" data-rate-name="Auto (new)">
+            <span class="rate-name">Auto (New)</span>
+            <span class="rate-val rate-value num">6.20%</span>
+            <span class="rate-chg chg down">▼ -0.15</span>
+          </div>
+          <div class="rate-row" data-rate-name="Auto (used)">
+            <span class="rate-name">Auto (Used)</span>
+            <span class="rate-val rate-value num">8.40%</span>
+            <span class="rate-chg chg up">▲ +0.30</span>
+            <span class="badge badge-amber">Refi Alert</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Credit Union Auto</span>
+            <span class="rate-val num">5.90%</span>
+            <span class="rate-chg chg down">▼ -0.10</span>
+            <span class="badge badge-green">Best Rate</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Dealer Financing</span>
+            <span class="rate-val num">9.50%</span>
+            <span class="rate-chg chg up">▲ +0.25</span>
+            <span class="badge badge-red">High</span>
+          </div>
+        </div>
+        <div id="rates-personal" class="tab-content">
+          <div class="rate-row" data-rate-name="Personal">
+            <span class="rate-name">Personal (Prime)</span>
+            <span class="rate-val rate-value num">11.20%</span>
+            <span class="rate-chg chg flat">— 0.00</span>
+            <span class="badge badge-amber">Refi Alert</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">LightStream</span>
+            <span class="rate-val num">8.49%</span>
+            <span class="rate-chg chg down">▼ -0.20</span>
+            <span class="badge badge-green">Best Rate</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Marcus by GS</span>
+            <span class="rate-val num">9.99%</span>
+            <span class="rate-chg chg flat">— 0.00</span>
+          </div>
+          <div class="rate-row">
+            <span class="rate-name">Upstart</span>
+            <span class="rate-val num">12.40%</span>
+            <span class="rate-chg chg up">▲ +0.50</span>
+            <span class="badge badge-red">High</span>
+          </div>
+        </div>
+        <div class="stacked-bar-section">
+          <div class="stacked-bar-label">Avg Balance Position</div>
+          <div class="stacked-bar-wrap" id="stacked-bar"></div>
+          <div class="stacked-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#22C55E"></div>Student</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>Auto</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>Personal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /row1 -->
+
+  <!-- ROW 2 -->
+  <div class="row2">
+
+    <!-- PANEL D: Refi Opportunities -->
+    <div class="panel" id="panel-d">
+      <div class="panel-header">
+        <span class="panel-title">Refi Opportunities</span>
+        <div class="panel-header-spacer"></div>
+        <div class="chip-row" style="padding:0;border:none;gap:3px;">
+          <span class="chip active" onclick="setRefiFilter('all',this)">All Loans</span>
+          <span class="chip" onclick="setRefiFilter('500',this)">&gt;$500 Savings</span>
+          <span class="chip" onclick="setRefiFilter('1000',this)">&gt;$1000 Savings</span>
+        </div>
+      </div>
+      <div class="panel-body" style="overflow:hidden;min-height:0;">
+        <div class="tbl-scroll" style="flex:0 0 auto;max-height:180px;">
+          <table class="data-table" id="refi-table">
+            <thead>
+              <tr>
+                <th>LOAN</th>
+                <th>CURRENT RATE</th>
+                <th>MARKET RATE</th>
+                <th>MO SAVINGS</th>
+                <th>LIFETIME SAVINGS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="refi-tbody"></tbody>
+          </table>
+        </div>
+        <div style="flex:1;padding:6px 8px;min-height:0;">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Rate Spread Over Time (6-Month)</div>
+          <svg id="spread-chart" width="100%" height="110" viewBox="0 0 600 110" preserveAspectRatio="none" style="display:block;"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL E: Balance Charts -->
+    <div class="panel" id="panel-e">
+      <div class="panel-header">
+        <span class="panel-title">Balance Levels</span>
+        <div class="panel-header-spacer"></div>
+        <div class="metric-toggle" id="time-filter">
+          <button class="mtoggle active" onclick="setTimeFilter('3M',this)">3M</button>
+          <button class="mtoggle" onclick="setTimeFilter('6M',this)">6M</button>
+          <button class="mtoggle" onclick="setTimeFilter('1Y',this)">1Y</button>
+          <button class="mtoggle" onclick="setTimeFilter('All',this)">All</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-container" style="padding:8px;flex:1;min-height:0;">
+          <svg id="balance-chart" width="100%" height="160" viewBox="0 0 320 160" preserveAspectRatio="none" style="display:block;width:100%;"></svg>
+        </div>
+        <div class="balance-bars-section" id="bal-bars"></div>
+      </div>
+    </div>
+
+  </div><!-- /row2 -->
+
+  <!-- ROW 3 -->
+  <div class="row3">
+    <!-- PANEL F: Cash Flow Map -->
+    <div class="panel" id="panel-f">
+      <div class="panel-header">
+        <span class="panel-title">Cash Flow Map — 2026</span>
+        <div class="panel-header-spacer"></div>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);">Total due monthly vs. income estimate</span>
+      </div>
+      <div class="panel-body" style="overflow:visible;">
+        <div class="cashflow-grid" id="cashflow-grid"></div>
+      </div>
+    </div>
+  </div><!-- /row3 -->
+
+  <!-- ── SOLO PANEL VIEWS (single-panel full-width) ── -->
+  <div class="solo-panel lt-solo">
+    <div class="panel" id="panel-a-solo">
+      <div class="panel-header"><span class="panel-title">Loan Tracker — Full View</span></div>
+      <div class="panel-body" id="lt-solo-body"></div>
+    </div>
+  </div>
+  <div class="solo-panel pw-solo">
+    <div class="panel" id="panel-b-solo">
+      <div class="panel-header">
+        <span class="panel-title">Pricing Window — Repayment Simulator</span>
+        <div style="display:flex;gap:4px;margin-left:8px;">
+          <button class="ptab active" onclick="switchRepayTab('snowball',this)">Snowball</button>
+          <button class="ptab" onclick="switchRepayTab('avalanche',this)">Avalanche</button>
+          <button class="ptab" onclick="switchRepayTab('standard',this)">Standard</button>
+        </div>
+      </div>
+      <div class="panel-body" id="pw-solo-body"></div>
+    </div>
+  </div>
+  <div class="solo-panel lr-solo">
+    <div class="panel" id="panel-c-solo">
+      <div class="panel-header"><span class="panel-title">Live Market Rates</span>
+        <div style="display:flex;gap:4px;margin-left:8px;">
+          <button class="mtoggle active" onclick="setMetric('APR',this)">APR</button>
+          <button class="mtoggle" onclick="setMetric('Monthly',this)">Monthly</button>
+          <button class="mtoggle" onclick="setMetric('Total',this)">Total</button>
+        </div>
+      </div>
+      <div class="panel-body" id="lr-solo-body"></div>
+    </div>
+  </div>
+  <div class="solo-panel as-solo">
+    <div class="panel" id="panel-d-solo">
+      <div class="panel-header"><span class="panel-title">Arb Spreads — Refinancing Opportunities</span></div>
+      <div class="panel-body" id="as-solo-body"></div>
+    </div>
+  </div>
+  <div class="solo-panel cf-solo">
+    <div class="panel" id="panel-f-solo">
+      <div class="panel-header"><span class="panel-title">Cash Flow Map — 2026</span></div>
+      <div class="panel-body" style="overflow:visible;" id="cf-solo-body"></div>
+    </div>
+  </div>
+
+  <!-- ── STRATEGY GRID VIEW ── -->
+  <div class="view-section" id="view-strategygrid">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Snowball Strategy</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-left:8px;">Lowest balance first</span></div>
+        <div class="panel-body" id="sg-snowball"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Avalanche Strategy</span><span style="font-family:var(--mono);font-size:9px;color:var(--green);margin-left:8px;">Saves most interest</span></div>
+        <div class="panel-body" id="sg-avalanche"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:8px;">
+      <div class="panel-header"><span class="panel-title">Strategy Comparison</span></div>
+      <div class="panel-body" id="sg-comparison"></div>
+    </div>
+  </div>
+
+  <!-- ── LENDER DATA VIEW ── -->
+  <div class="view-section" id="view-lenderdata">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Country / Lender Data</span></div>
+      <div class="panel-body">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
+          <thead><tr style="border-bottom:1px solid var(--panel-border);">
+            <th style="text-align:left;padding:6px 8px;color:var(--text-muted);">LENDER</th>
+            <th style="text-align:left;padding:6px 8px;color:var(--text-muted);">TYPE</th>
+            <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">MIN APR</th>
+            <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">MAX APR</th>
+            <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">MAX TERM</th>
+            <th style="text-align:left;padding:6px 8px;color:var(--text-muted);">NOTES</th>
+          </tr></thead>
+          <tbody id="lender-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NOTIFICATIONS VIEW ── -->
+  <div class="view-section" id="view-notifications">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Notifications</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-left:8px;">3 unread</span></div>
+      <div class="panel-body" id="notif-list"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════
+     TICKER BAR
+═══════════════════════════════════════ -->
+<div id="ticker">
+  <div class="ticker-label">LIVE FEED</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+/* ── THEME TOGGLE ── */
+(function() {
+  const saved = (() => { try { return localStorage.getItem('ll_theme'); } catch(e) { return null; } })();
+  if (saved === 'light') document.body.classList.add('light-mode');
+})();
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  try { localStorage.setItem('ll_theme', isLight ? 'light' : 'dark'); } catch(e) {}
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const isLight = document.body.classList.contains('light-mode');
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.innerHTML = isLight
+      ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`
+      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+  });
+}
+
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const LOANS = [
+  { id: "loan_1", label: "Federal Student Loan", type: "student", principal: 38000, rate: 5.5, termMonths: 120, balance: 34200, monthlyPayment: 412.54 },
+  { id: "loan_2", label: "Car Loan",              type: "auto",    principal: 12000, rate: 8.9, termMonths: 60,  balance: 9800,  monthlyPayment: 248.85 },
+  { id: "loan_3", label: "Personal Loan",         type: "personal",principal: 5000,  rate: 11.2,termMonths: 36,  balance: 3100,  monthlyPayment: 163.93 }
+];
+
+const MARKET_RATES = {
+  student: 5.5,
+  auto: 6.2,
+  personal: 8.49
+};
+
+let currentRepayTab = 'snowball';
+let currentRepayLoan = 'ALL';
+let currentExtraPayment = 0;
+let currentTimeFilter = '3M';
+let currentRefiFilter = 'all';
+let currentMetric = 'APR';
+
+/* ═══════════════════════════════════════
+   UTILITY FUNCTIONS
+═══════════════════════════════════════ */
+// Safe formatters — guard against NaN, null, undefined, Infinity
+const fmt$ = v => {
+  const n = parseFloat(v);
+  if (!isFinite(n)) return '$0.00';
+  return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+};
+const fmt$k = v => {
+  const n = parseFloat(v);
+  if (!isFinite(n)) return '$0.0k';
+  return '$' + (n/1000).toFixed(1) + 'k';
+};
+const fmtPct = v => {
+  const n = parseFloat(v);
+  if (!isFinite(n)) return '0.00%';
+  return n.toFixed(2) + '%';
+};
+
+// XSS prevention — escape user-supplied strings before innerHTML injection
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function calcMonthlyPayment(P, annualRate, months) {
+  P          = Math.abs(parseFloat(P)          || 0);
+  annualRate = Math.abs(parseFloat(annualRate) || 0);
+  months     = Math.abs(parseInt(months)       || 0);
+  if (!P || !months) return 0;
+  if (annualRate === 0) return P / months;
+  const r      = annualRate / 100 / 12;
+  const factor = Math.pow(1 + r, months);
+  if (!isFinite(factor) || factor === 1) return P / months;
+  return P * (r * factor) / (factor - 1);
+}
+
+function calcAmortization(P, annualRate, months, extraPayment=0) {
+  P            = Math.abs(parseFloat(P)            || 0);
+  annualRate   = Math.abs(parseFloat(annualRate)   || 0);
+  months       = Math.abs(parseInt(months)         || 0);
+  extraPayment = Math.max(0, parseFloat(extraPayment) || 0);
+
+  if (!P || !months) return [];
+
+  const r       = annualRate / 100 / 12;
+  const base    = calcMonthlyPayment(P, annualRate, months);
+  const payment = base + extraPayment;
+  let balance   = P;
+  const rows    = [];
+  const MAX     = 1200;
+
+  // Detect negative amortization
+  const monthlyInterest = balance * r;
+  if (r > 0 && payment <= monthlyInterest) {
+    // Cap at declared term with a warning — avoids infinite loop
+    for (let i = 1; i <= Math.min(months, MAX) && balance > 0.01; i++) {
+      const interest  = balance * r;
+      let principal   = payment - interest;
+      if (principal > balance) principal = balance;
+      balance -= principal;
+      if (balance < 0.01) balance = 0;
+      if (!isFinite(balance)) { balance = 0; break; }
+      rows.push({ month: i, payment: principal + interest, principal, interest, balance, warning: 'payment_below_interest' });
+    }
+    return rows;
+  }
+
+  for (let i = 1; i <= Math.min(months, MAX) && balance > 0.01; i++) {
+    const interest = balance * r;
+    if (!isFinite(interest)) break;
+    let principal = payment - interest;
+    if (principal > balance) principal = balance;
+    balance -= principal;
+    if (balance < 0.01) balance = 0;
+    if (!isFinite(balance)) { balance = 0; break; }
+    rows.push({ month: i, payment: principal + interest, principal, interest, balance });
+  }
+  return rows;
+}
+
+function totalInterest(amort) {
+  return amort.reduce((s,r) => s + r.interest, 0);
+}
+
+/* ═══════════════════════════════════════
+   STRATEGY SORTING
+═══════════════════════════════════════ */
+function getStrategyOrder(strategy) {
+  const loans = [...LOANS];
+  if (strategy === 'avalanche') {
+    loans.sort((a,b) => b.rate - a.rate);
+  } else if (strategy === 'snowball') {
+    loans.sort((a,b) => a.balance - b.balance);
+  }
+  return loans;
+}
+
+function getStrategyNote(loan, strategy, month) {
+  if (strategy === 'avalanche') {
+    if (loan.type === 'personal' && month <= 18) return 'Target';
+    if (loan.type === 'auto' && month > 18) return 'Target';
+    return '—';
+  }
+  if (strategy === 'snowball') {
+    if (loan.type === 'personal') return 'First';
+    if (loan.type === 'auto') return 'Second';
+    return '—';
+  }
+  return '—';
+}
+
+/* ═══════════════════════════════════════
+   PANEL A: LOAN TRACKER
+═══════════════════════════════════════ */
+function renderLoanTracker() {
+  try {
+    const tbody = document.getElementById('loan-tracker-tbody');
+    if (!tbody) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans configured.</td></tr>';
+      return;
+    }
+
+    let totalBal = 0, totalMonthly = 0;
+
+    let html = LOANS.map(loan => {
+      const balance   = parseFloat(loan.balance)        || 0;
+      const monthly   = parseFloat(loan.monthlyPayment) || 0;
+      const rate      = parseFloat(loan.rate)           || 0;
+      totalBal     += balance;
+      totalMonthly += monthly;
+
+      const payoff = calcAmortization(balance, rate, parseInt(loan.termMonths) || 0);
+      // Guard: payoff[0] might not exist if balance=0 or term=0
+      const chg    = (payoff.length > 0 && payoff[0]) ? -payoff[0].principal : 0;
+      const chgCls = chg < -300 ? 'num-green' : 'num-amber';
+      const chgTxt = '$' + Math.abs(isFinite(chg) ? chg : 0).toFixed(0);
+
+      let rateWarnHtml = '';
+      if (rate > 15) {
+        rateWarnHtml = `<span class="rate-warn-badge red">&#9888; HIGH</span>`;
+      } else if (rate > 10) {
+        rateWarnHtml = `<span class="rate-warn-badge amber">&#9888;</span>`;
+      }
+
+      return `<tr class="row-${escapeHtml(loan.type)}">
+        <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(loan.label)}</td>
+        <td class="num">${fmt$k(balance)}</td>
+        <td class="num">${fmtPct(rate)}${rateWarnHtml}</td>
+        <td class="num">${fmt$(monthly)}</td>
+        <td class="num ${chgCls}">${chgTxt}</td>
+      </tr>`;
+    }).join('');
+
+    html += `<tr class="totals">
+      <td>TOTAL</td>
+      <td class="num">${fmt$k(totalBal)}</td>
+      <td class="num">—</td>
+      <td class="num">${fmt$(totalMonthly)}</td>
+      <td></td>
+    </tr>`;
+
+    tbody.innerHTML = html;
+
+    // ALERTS row at bottom of Panel A
+    const existingAlerts = document.getElementById('panel-a-alerts');
+    if (existingAlerts) existingAlerts.remove();
+
+    const warningLoans = LOANS.filter(l => (parseFloat(l.rate) || 0) > 10);
+    if (warningLoans.length > 0) {
+      const alertDiv     = document.createElement('div');
+      alertDiv.id        = 'panel-a-alerts';
+      alertDiv.className = 'panel-alerts-row';
+      alertDiv.innerHTML = `<span>&#9888;</span><span>${warningLoans.length} loan${warningLoans.length > 1 ? 's' : ''} need${warningLoans.length === 1 ? 's' : ''} attention</span>`;
+      const panelBody    = document.getElementById('panel-a');
+      if (panelBody) {
+        const pb = panelBody.querySelector('.panel-body');
+        if (pb) pb.appendChild(alertDiv);
+      }
+    }
+  } catch (e) {
+    console.error('renderLoanTracker failed:', e);
+    const tbody = document.getElementById('loan-tracker-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</td></tr>';
+  }
+}
+
+/* ═══════════════════════════════════════
+   PANEL B: REPAYMENT WINDOW
+═══════════════════════════════════════ */
+function renderAmortTable() {
+  try {
+    const tbody = document.getElementById('amort-tbody');
+    if (!tbody) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans configured.</td></tr>';
+      return;
+    }
+
+    const strategy = currentRepayTab;
+    const extra = currentExtraPayment;
+
+    let loans = currentRepayLoan === 'ALL' ? LOANS : LOANS.filter(l => l.id === currentRepayLoan);
+    if (loans.length === 0) loans = LOANS;
+
+    const extraPerLoan = loans.length > 0 ? extra / loans.length : 0;
+    let allRows = [];
+
+    loans.forEach(loan => {
+      const amort = calcAmortization(loan.balance, loan.rate, loan.termMonths, extraPerLoan);
+      amort.forEach(r => {
+        allRows.push({...r, loanId: loan.id, loanType: loan.type, strategy});
+      });
+    });
+
+    // If ALL, interleave by month and sum
+    let displayRows = [];
+    if (currentRepayLoan === 'ALL') {
+      const lengths = loans.map(l => {
+        const a = calcAmortization(l.balance, l.rate, l.termMonths, extraPerLoan);
+        return a.length;
+      });
+      const maxMonths = lengths.length > 0 ? Math.max(...lengths) : 0;
+      for (let m = 1; m <= maxMonths; m++) {
+        const monthRows = allRows.filter(r => r.month === m);
+        if (monthRows.length === 0) continue;
+        const total = monthRows.reduce((acc, r) => ({
+          month: m,
+          payment: acc.payment + r.payment,
+          principal: acc.principal + r.principal,
+          interest: acc.interest + r.interest,
+          balance: acc.balance + r.balance,
+          loanType: 'mixed',
+          strategy: r.strategy
+        }), {payment:0, principal:0, interest:0, balance:0});
+        displayRows.push(total);
+      }
+    } else {
+      displayRows = allRows;
+    }
+
+    let html = '';
+    displayRows.slice(0, 60).forEach((r, idx) => {
+      const interestDom = r.interest > r.principal;
+      const rowClass = interestDom ? 'row-amber-tint' : '';
+      // Guard: loans[0] may not exist
+      const noteLoan = loans.length > 0 ? loans[0] : null;
+      const note = noteLoan ? getStrategyNote(noteLoan, strategy, r.month) : '—';
+      const noteHtml = note === 'Target' ? `<span class="badge badge-green">${note}</span>` :
+                       note === 'First'  ? `<span class="badge badge-green">${note}</span>` :
+                       note === 'Second' ? `<span class="badge badge-amber">${note}</span>` : '—';
+
+      html += `<tr class="${rowClass}">
+        <td class="num num-dim">${r.month}</td>
+        <td class="num">${fmt$(r.payment)}</td>
+        <td class="num num-green">${fmt$(r.principal)}</td>
+        <td class="num ${interestDom ? 'num-amber' : 'num-dim'}">${fmt$(r.interest)}</td>
+        <td class="num">${fmt$(r.balance)}</td>
+        <td>${noteHtml}</td>
+      </tr>`;
+    });
+
+    tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No data</td></tr>';
+  } catch (e) {
+    console.error('renderAmortTable failed:', e);
+    const tbody = document.getElementById('amort-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</td></tr>';
+  }
+}
+
+function applyExtraPayment() {
+  const val = Math.max(0, parseFloat(document.getElementById('extra-payment').value) || 0);
+  currentExtraPayment = val;
+
+  // Calculate savings
+  const resultEl = document.getElementById('extra-result');
+  if (val > 0 && LOANS && LOANS.length > 0) {
+    let normalMonths = 0, extraMonths = 0;
+    let normalInterest = 0, extraInterest = 0;
+    const extraPerLoan = val / LOANS.length;
+    LOANS.forEach(loan => {
+      const normal = calcAmortization(loan.balance, loan.rate, loan.termMonths, 0);
+      const extra  = calcAmortization(loan.balance, loan.rate, loan.termMonths, extraPerLoan);
+      normalMonths  = Math.max(normalMonths,  normal.length);
+      extraMonths   = Math.max(extraMonths,   extra.length);
+      normalInterest += totalInterest(normal);
+      extraInterest  += totalInterest(extra);
+    });
+    const savedMonths   = normalMonths - extraMonths;
+    const savedInterest = normalInterest - extraInterest;
+    if (resultEl) resultEl.innerHTML = `Payoff <span class="val">-${savedMonths}mo</span> · Save <span class="val">${fmt$(savedInterest)}</span>`;
+  } else {
+    if (resultEl) resultEl.innerHTML = '';
+  }
+
+  renderAmortTable();
+}
+
+function switchRepayTab(tab, btn) {
+  currentRepayTab = tab;
+  document.querySelectorAll('#repay-tabs .ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAmortTable();
+}
+
+function setRepayLoan(loan, el) {
+  currentRepayLoan = loan;
+  document.querySelectorAll('#repay-loan-chips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderAmortTable();
+}
+
+/* ═══════════════════════════════════════
+   PANEL C: MARKET RATES TABS
+═══════════════════════════════════════ */
+function switchRatesTab(tab, btn) {
+  document.querySelectorAll('#rates-tabs .ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#panel-c .tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('rates-' + tab).classList.add('active');
+}
+
+function setMetric(metric, btn) {
+  currentMetric = metric;
+  document.querySelectorAll('.metric-toggle .mtoggle').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const rates = {
+    'Federal Subsidized':   { apr: 5.50, term: 120 },
+    'Federal Unsubsidized': { apr: 7.05, term: 120 },
+    'Private Student':      { apr: 8.90, term: 120 },
+    'Auto (new)':           { apr: 6.20, term: 60  },
+    'Auto (used)':          { apr: 8.40, term: 60  },
+    'Personal':             { apr: 11.20, term: 36 }
+  };
+
+  document.querySelectorAll('.rate-row').forEach(row => {
+    const name = row.dataset.rateName;
+    const r = rates[name];
+    if (!r) return;
+    const el = row.querySelector('.rate-value');
+    if (!el) return;
+    if (metric === 'APR')     el.textContent = r.apr.toFixed(2) + '%';
+    if (metric === 'Monthly') el.textContent = (r.apr / 12).toFixed(3) + '%';
+    if (metric === 'Total')   el.textContent = (r.apr * r.term / 12).toFixed(1) + '%';
+  });
+}
+
+function renderStackedBar() {
+  const el = document.getElementById('stacked-bar');
+  if (!el) return;
+  if (!LOANS || LOANS.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+  const total = LOANS.reduce((s, l) => s + (parseFloat(l.balance) || 0), 0);
+  if (total <= 0) {
+    el.innerHTML = '<div class="stacked-bar-seg" style="width:100%;background:var(--surface2)"></div>';
+    return;
+  }
+  el.innerHTML = LOANS.map(loan => {
+    const bal = parseFloat(loan.balance) || 0;
+    const pct = (bal / total * 100).toFixed(1);
+    const cls = `seg-${escapeHtml(loan.type)}`;
+    return `<div class="stacked-bar-seg ${cls}" style="width:${pct}%">${parseFloat(pct) > 10 ? pct + '%' : ''}</div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   PANEL D: REFI OPPORTUNITIES
+═══════════════════════════════════════ */
+// REFI_DATA is built lazily in renderRefiTable() to avoid LOANS[n] crashes at parse time
+const REFI_MARKET_RATES = [
+  { index: 0, marketRate: 5.50, lender: 'SoFi' },
+  { index: 1, marketRate: 5.90, lender: 'Credit Union' },
+  { index: 2, marketRate: 8.49, lender: 'LightStream' }
+];
+
+function calcRefiSavings(loan, marketRate) {
+  if (!loan) return { monthly: 0, lifetime: 0 };
+  const currentMonthly = calcMonthlyPayment(loan.balance, loan.rate, loan.termMonths);
+  const newMonthly     = calcMonthlyPayment(loan.balance, marketRate, loan.termMonths);
+  const monthly  = (isFinite(currentMonthly) ? currentMonthly : 0) - (isFinite(newMonthly) ? newMonthly : 0);
+  const termMos  = Math.abs(parseInt(loan.termMonths) || 0);
+  const lifetime = monthly * termMos;
+  return { monthly, lifetime };
+}
+
+function renderRefiTable() {
+  try {
+    const tbody = document.getElementById('refi-tbody');
+    if (!tbody) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans configured.</td></tr>';
+      return;
+    }
+
+    // Build REFI_DATA lazily — only include entries where the LOANS index exists
+    let refiData = REFI_MARKET_RATES
+      .filter(d => d.index < LOANS.length)
+      .map(d => ({ loan: LOANS[d.index], marketRate: d.marketRate, lender: d.lender }));
+
+    if (currentRefiFilter === '500') {
+      refiData = refiData.filter(d => calcRefiSavings(d.loan, d.marketRate).lifetime > 500);
+    } else if (currentRefiFilter === '1000') {
+      refiData = refiData.filter(d => calcRefiSavings(d.loan, d.marketRate).lifetime > 1000);
+    }
+
+    tbody.innerHTML = refiData.map(d => {
+      const { monthly, lifetime } = calcRefiSavings(d.loan, d.marketRate);
+      const highlight = lifetime > 500;
+      const dotColor  = d.loan.type === 'student' ? '#22C55E' : d.loan.type === 'auto' ? '#F59E0B' : '#EF4444';
+      // Escape label and lender for safe HTML and inline onclick attribute
+      const safeLabel  = escapeHtml(d.loan.label);
+      const safeLender = escapeHtml(d.lender);
+      return `<tr class="${highlight ? 'refi-highlight' : ''}">
+        <td>
+          <span class="legend-dot" style="width:6px;height:6px;background:${dotColor};display:inline-block;border-radius:50%;margin-right:4px;"></span>
+          ${safeLabel}
+        </td>
+        <td class="num num-amber">${fmtPct(d.loan.rate)}</td>
+        <td class="num num-green">${fmtPct(d.marketRate)} <span style="font-size:9px;color:var(--text-muted)">via ${safeLender}</span></td>
+        <td class="num ${monthly > 0 ? 'num-green' : 'num-red'}">${monthly > 0 ? '+' : ''}${fmt$(monthly)}</td>
+        <td class="num ${lifetime > 1000 ? 'num-green' : lifetime > 500 ? 'num-amber' : 'num-dim'}">${fmt$(lifetime)}</td>
+        <td><button class="tbl-btn apply" onclick="showApplyToast(${JSON.stringify(d.loan.label)},${JSON.stringify(d.lender)},${isFinite(monthly) ? monthly.toFixed(2) : '0'})">Apply &#8594;</button></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:16px;font-family:var(--mono);font-size:11px;">No qualifying loans for this filter.</td></tr>';
+  } catch (e) {
+    console.error('renderRefiTable failed:', e);
+    const tbody = document.getElementById('refi-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</td></tr>';
+  }
+}
+
+function setRefiFilter(filter, el) {
+  currentRefiFilter = filter;
+  document.querySelectorAll('.panel-header .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderRefiTable();
+}
+
+function renderSpreadChart() {
+  try {
+    const svg = document.getElementById('spread-chart');
+    if (!svg) return;
+    const W = 600, H = 110;
+    const pad = { top: 10, right: 10, bottom: 20, left: 36 };
+    const cW = W - pad.left - pad.right;
+    const cH = H - pad.top - pad.bottom;
+
+    // 6 months of simulated spread data for each loan
+    const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
+    const spreads = {
+      student: [0.0, 0.05, 0.10, 0.0, -0.05, 0.0],
+      auto:    [2.8, 2.7, 3.0, 3.1, 2.9, 3.0],
+      personal:[2.5, 2.6, 2.8, 2.9, 2.7, 2.71]
+    };
+
+    const allVals = [...spreads.student, ...spreads.auto, ...spreads.personal];
+    const rawMin = Math.min(...allVals) - 0.1;
+    const rawMax = Math.max(...allVals) + 0.1;
+    // Guard: if all values are identical, expand range to prevent division by zero
+    const minV = rawMin;
+    const maxV = rawMax !== rawMin ? rawMax : rawMin + 1;
+    const range = maxV - minV;
+
+    const xStep = months.length > 1 ? cW / (months.length - 1) : cW;
+    const yScale = v => {
+      const y = pad.top + cH - ((v - minV) / range) * cH;
+      return isFinite(y) ? Math.max(pad.top, Math.min(pad.top + cH, y)) : pad.top + cH / 2;
+    };
+
+    const makePath = (data, color) => {
+      const pts = data.map((v, i) => `${pad.left + i * xStep},${yScale(v)}`).join(' L ');
+      return `<path d="M ${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>`;
+    };
+
+    const makeDots = (data, color) => data.map((v, i) =>
+      `<circle cx="${pad.left + i * xStep}" cy="${yScale(v)}" r="2.5" fill="${color}" opacity="0.8"/>`
+    ).join('');
+
+    const gridLines = [0, 1, 2, 3].map(i => {
+      const v = minV + range * (i / 3);
+      const y = yScale(v);
+      return `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" stroke="rgba(34,197,94,0.08)" stroke-dasharray="3,3"/>
+              <text x="${pad.left - 4}" y="${y + 3}" text-anchor="end" fill="rgba(76,175,80,0.4)" font-size="8" font-family="DM Mono, monospace">${v.toFixed(1)}</text>`;
+    }).join('');
+
+    const xLabels = months.map((m, i) =>
+      `<text x="${pad.left + i * xStep}" y="${H - 4}" text-anchor="middle" fill="rgba(76,175,80,0.4)" font-size="8" font-family="DM Mono, monospace">${m}</text>`
+    ).join('');
+
+    svg.innerHTML = `
+      ${gridLines}
+      ${xLabels}
+      <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + cH}" stroke="rgba(34,197,94,0.12)"/>
+      ${makePath(spreads.student, '#22C55E')}
+      ${makePath(spreads.auto, '#F59E0B')}
+      ${makePath(spreads.personal, '#EF4444')}
+      ${makeDots(spreads.student, '#22C55E')}
+      ${makeDots(spreads.auto, '#F59E0B')}
+      ${makeDots(spreads.personal, '#EF4444')}
+      <text x="${W - pad.right}" y="${pad.top + 8}" text-anchor="end" fill="#22C55E" font-size="8" font-family="DM Mono, monospace">Student</text>
+      <text x="${W - pad.right}" y="${pad.top + 18}" text-anchor="end" fill="#F59E0B" font-size="8" font-family="DM Mono, monospace">Auto</text>
+      <text x="${W - pad.right}" y="${pad.top + 28}" text-anchor="end" fill="#EF4444" font-size="8" font-family="DM Mono, monospace">Personal</text>
+    `;
+  } catch (e) {
+    console.error('renderSpreadChart failed:', e);
+    const svg = document.getElementById('spread-chart');
+    if (svg) svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="rgba(76,175,80,0.4)" font-size="11" font-family="DM Mono, monospace">Chart unavailable</text>';
+  }
+}
+
+/* ═══════════════════════════════════════
+   PANEL E: BALANCE CHART
+═══════════════════════════════════════ */
+function setTimeFilter(filter, btn) {
+  currentTimeFilter = filter;
+  document.querySelectorAll('#time-filter .mtoggle').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBalanceChart();
+}
+
+function renderBalanceChart() {
+  try {
+    const svg = document.getElementById('balance-chart');
+    if (!svg) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="rgba(76,175,80,0.4)" font-size="11" font-family="DM Mono, monospace">No loans</text>';
+      renderBalanceBars();
+      return;
+    }
+
+    const W = 320, H = 160;
+    const pad = { top: 10, right: 10, bottom: 22, left: 42 };
+    const cW = W - pad.left - pad.right;
+    const cH = H - pad.top - pad.bottom;
+
+    const monthsMap = { '3M': 3, '6M': 6, '1Y': 12, 'All': 60 };
+    const months = monthsMap[currentTimeFilter] || 6;
+
+    // Generate balance trajectory for each loan
+    const series = LOANS.map(loan => {
+      const amort = calcAmortization(loan.balance, loan.rate, loan.termMonths, 0);
+      const pts = [parseFloat(loan.balance) || 0];
+      for (let i = 0; i < Math.min(months, amort.length); i++) {
+        pts.push(amort[i].balance);
+      }
+      return pts;
+    });
+
+    const colors = ['#22C55E', '#F59E0B', '#EF4444'];
+    const allVals = series.flat().filter(v => isFinite(v));
+    const rawMax = allVals.length > 0 ? Math.max(...allVals) * 1.05 : 1;
+    // Guard: maxV must be > 0 to avoid division by zero in yScale
+    const maxV = rawMax > 0 ? rawMax : 1;
+    const minV = 0;
+    const range = maxV - minV;
+
+    const xStep = months > 0 ? cW / months : cW;
+    const yPos = v => {
+      const y = pad.top + cH - ((v - minV) / range) * cH;
+      return isFinite(y) ? Math.max(pad.top, Math.min(pad.top + cH, y)) : pad.top + cH;
+    };
+    const xPos = i => Math.max(pad.left, Math.min(W - pad.right, pad.left + i * xStep));
+
+    const makeArea = (pts, color) => {
+      if (pts.length === 0) return '';
+      const path = pts.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' L ');
+      const lastX = xPos(pts.length - 1);
+      const area = `M ${pad.left},${pad.top + cH} L ${path} L ${lastX},${pad.top + cH} Z`;
+      return `<path d="${area}" fill="${color}" opacity="0.06"/>
+              <path d="M ${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>`;
+    };
+
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map(f => {
+      const v = minV + range * f;
+      const y = yPos(v);
+      const label = v >= 1000 ? `$${(v/1000).toFixed(0)}k` : `$${v.toFixed(0)}`;
+      return `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" stroke="rgba(34,197,94,0.07)" stroke-dasharray="2,3"/>
+              <text x="${pad.left - 3}" y="${y + 3}" text-anchor="end" fill="rgba(76,175,80,0.4)" font-size="7.5" font-family="DM Mono, monospace">${label}</text>`;
+    }).join('');
+
+    const xLabels = Array.from({length: Math.min(months + 1, 7)}, (_, i) => {
+      const idx = Math.round(i * months / Math.min(months, 6));
+      const x = xPos(idx);
+      return `<text x="${x}" y="${H - 5}" text-anchor="middle" fill="rgba(76,175,80,0.4)" font-size="7.5" font-family="DM Mono, monospace">M${idx}</text>`;
+    }).join('');
+
+    svg.innerHTML = `
+      ${gridLines}
+      ${xLabels}
+      <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + cH}" stroke="rgba(34,197,94,0.12)"/>
+      <line x1="${pad.left}" y1="${pad.top + cH}" x2="${W - pad.right}" y2="${pad.top + cH}" stroke="rgba(34,197,94,0.12)"/>
+      ${series.map((pts, i) => makeArea(pts, colors[i % colors.length])).join('')}
+    `;
+
+    renderBalanceBars();
+  } catch (e) {
+    console.error('renderBalanceChart failed:', e);
+    const svg = document.getElementById('balance-chart');
+    if (svg) svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="rgba(76,175,80,0.4)" font-size="11" font-family="DM Mono, monospace">Chart unavailable</text>';
+  }
+}
+
+function renderBalanceBars() {
+  try {
+    const container = document.getElementById('bal-bars');
+    if (!container) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    const colors = ['#22C55E', '#F59E0B', '#EF4444'];
+
+    container.innerHTML = LOANS.map((loan, i) => {
+      const bal  = parseFloat(loan.balance)   || 0;
+      const prin = parseFloat(loan.principal) || 0;
+      // Guard: principal must be > 0 to avoid division by zero
+      const pct  = prin > 0 ? Math.min(100, Math.max(0, (bal / prin * 100))).toFixed(0) : '0';
+      const color = colors[i % colors.length];
+      // Use only the first two words for the short label; escapeHtml for safety
+      const shortLabel = escapeHtml(String(loan.label || '').split(' ').slice(0, 2).join(' '));
+      return `<div class="bal-bar-row">
+        <div class="bal-bar-label">
+          <span>${shortLabel}</span>
+          <span style="color:${color}">${fmt$k(bal)} / ${fmt$k(prin)}</span>
+        </div>
+        <div class="bal-bar-track">
+          <div class="bal-bar-fill" style="width:${pct}%;background:${color};opacity:0.7;"></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('renderBalanceBars failed:', e);
+  }
+}
+
+/* ═══════════════════════════════════════
+   PANEL F: CASH FLOW MAP
+═══════════════════════════════════════ */
+function renderCashFlowMap() {
+  try {
+    const grid = document.getElementById('cashflow-grid');
+    if (!grid) return;
+
+    if (!LOANS || LOANS.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans configured.</div>';
+      return;
+    }
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const totalMonthly = LOANS.reduce((s, l) => s + (parseFloat(l.monthlyPayment) || 0), 0);
+    const INCOME_EST = 3200;
+
+    grid.innerHTML = months.map((mo, i) => {
+      // Simulate slight variation per month
+      const variation = 1 + (Math.sin(i * 1.4) * 0.04);
+      const due = totalMonthly * variation;
+      const ratio = INCOME_EST > 0 ? due / INCOME_EST : 0;
+      const isTight = ratio > 0.23;
+      const cls = isTight ? 'tight' : 'can-afford';
+
+      // Breakdown — escape labels to prevent XSS
+      const breakdown = LOANS.map(l => ({
+        label: escapeHtml(String(l.label || '').split(' ').slice(0, 2).join(' ')),
+        amt:   (parseFloat(l.monthlyPayment) || 0) * variation
+      }));
+
+      const tooltipRows = breakdown.map(b =>
+        `<div class="cf-tooltip-row"><span>${b.label}</span><span>${fmt$(b.amt)}</span></div>`
+      ).join('') + `<div class="cf-tooltip-row" style="border-top:1px solid var(--panel-border);margin-top:3px;padding-top:3px;"><span>TOTAL</span><span style="color:var(--green)">${fmt$(due)}</span></div>`;
+
+      return `<div class="cashflow-cell ${cls}">
+        <div class="cf-month">${mo}</div>
+        <div class="cf-amount">${fmt$(due)}</div>
+        <div class="cf-tooltip">${tooltipRows}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('renderCashFlowMap failed:', e);
+    const grid = document.getElementById('cashflow-grid');
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</div>';
+  }
+}
+
+/* ═══════════════════════════════════════
+   TICKER
+═══════════════════════════════════════ */
+function renderTicker() {
+  const items = [
+    { text: 'Federal rates unchanged at 5.50%', cls: '' },
+    { text: 'Your Car Loan could save $892 via refinancing', cls: 'warn' },
+    { text: 'Snowball strategy saves you $1,104 vs standard', cls: 'hi' },
+    { text: 'Next payment due Feb 1', cls: '' },
+    { text: '3-Month streak milestone unlocked', cls: 'hi' },
+    { text: 'Personal loan payoff in 14 months at current rate', cls: '' },
+    { text: 'Avalanche saves $342 more than Snowball for your portfolio', cls: 'hi' },
+    { text: 'FOMC holds rates — no change expected Q1', cls: '' },
+    { text: 'Auto refi market rate dropped 0.15% this week', cls: 'hi' },
+    { text: 'Total debt reduced by $1,240 this year', cls: 'hi' },
+  ];
+
+  const sep = `<span class="ticker-sep"> · </span>`;
+  const itemsHtml = items.map(item =>
+    `<span class="ticker-item ${item.cls}">${item.text}</span>${sep}`
+  ).join('');
+
+  // Double for seamless loop
+  const inner = document.getElementById('ticker-inner');
+  inner.innerHTML = itemsHtml + itemsHtml;
+}
+
+/* ═══════════════════════════════════════
+   GLOBAL INTERACTIONS
+═══════════════════════════════════════ */
+function setLoanFilter(filter, btn) {
+  document.querySelectorAll('.tb-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const type = filter.toLowerCase();
+  const filtered = type === 'all' ? LOANS : LOANS.filter(l => l.type === type);
+
+  // Re-render Panel A with filtered loans
+  renderLoanTrackerFiltered(filtered);
+
+  // Re-render Panel B amortization with filtered loans
+  renderAmortTableFiltered(filtered);
+}
+
+function renderLoanTrackerFiltered(loans) {
+  try {
+    const tbody = document.getElementById('loan-tracker-tbody');
+    if (!tbody) return;
+
+    if (!loans || loans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans of this type</td></tr>';
+      return;
+    }
+
+    let totalBal = 0, totalMonthly = 0;
+
+    let html = loans.map(loan => {
+      const balance = parseFloat(loan.balance)        || 0;
+      const monthly = parseFloat(loan.monthlyPayment) || 0;
+      const rate    = parseFloat(loan.rate)           || 0;
+      totalBal     += balance;
+      totalMonthly += monthly;
+
+      const payoff = calcAmortization(balance, rate, parseInt(loan.termMonths) || 0);
+      // Guard: payoff[0] may not exist if balance=0
+      const chg    = (payoff.length > 0 && payoff[0]) ? -(payoff[0].principal) : 0;
+      const chgCls = chg < -300 ? 'num-green' : 'num-amber';
+      const chgTxt = '$' + Math.abs(isFinite(chg) ? chg : 0).toFixed(0);
+
+      return `<tr class="row-${escapeHtml(loan.type)}">
+        <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(loan.label)}</td>
+        <td class="num">${fmt$k(balance)}</td>
+        <td class="num">${fmtPct(rate)}</td>
+        <td class="num">${fmt$(monthly)}</td>
+        <td class="num ${chgCls}">${chgTxt}</td>
+      </tr>`;
+    }).join('');
+
+    html += `<tr class="totals">
+      <td>TOTAL</td>
+      <td class="num">${fmt$k(totalBal)}</td>
+      <td class="num">—</td>
+      <td class="num">${fmt$(totalMonthly)}</td>
+      <td></td>
+    </tr>`;
+
+    tbody.innerHTML = html;
+  } catch (e) {
+    console.error('renderLoanTrackerFiltered failed:', e);
+    const tbody = document.getElementById('loan-tracker-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</td></tr>';
+  }
+}
+
+function renderAmortTableFiltered(loans) {
+  try {
+    const tbody = document.getElementById('amort-tbody');
+    if (!tbody) return;
+
+    if (!loans || loans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No loans of this type</td></tr>';
+      return;
+    }
+
+    const strategy     = currentRepayTab;
+    const extra        = currentExtraPayment;
+    const extraPerLoan = extra / loans.length;
+
+    let allRows = [];
+    loans.forEach(loan => {
+      const amort = calcAmortization(loan.balance, loan.rate, loan.termMonths, extraPerLoan);
+      amort.forEach(r => {
+        allRows.push({...r, loanId: loan.id, loanType: loan.type, strategy});
+      });
+    });
+
+    let displayRows = [];
+    if (loans.length > 1) {
+      const lengths   = loans.map(l => {
+        const a = calcAmortization(l.balance, l.rate, l.termMonths, extraPerLoan);
+        return a.length;
+      });
+      const maxMonths = lengths.length > 0 ? Math.max(...lengths) : 0;
+      for (let m = 1; m <= maxMonths; m++) {
+        const monthRows = allRows.filter(r => r.month === m);
+        if (monthRows.length === 0) continue;
+        const total = monthRows.reduce((acc, r) => ({
+          month: m,
+          payment:   acc.payment   + r.payment,
+          principal: acc.principal + r.principal,
+          interest:  acc.interest  + r.interest,
+          balance:   acc.balance   + r.balance,
+          loanType: 'mixed',
+          strategy: r.strategy
+        }), {payment:0, principal:0, interest:0, balance:0});
+        displayRows.push(total);
+      }
+    } else {
+      displayRows = allRows;
+    }
+
+    let html = '';
+    displayRows.slice(0, 60).forEach(r => {
+      // Guard: loans[0] must exist before passing to getStrategyNote
+      const noteLoan = loans.length > 0 ? loans[0] : null;
+      const note = noteLoan ? getStrategyNote(noteLoan, strategy, r.month) : '—';
+      const noteHtml = note === 'Target' ? `<span class="badge badge-green">${note}</span>` :
+                       note === 'First'  ? `<span class="badge badge-green">${note}</span>` :
+                       note === 'Second' ? `<span class="badge badge-amber">${note}</span>` : '—';
+      html += `<tr>
+        <td class="num num-dim">${r.month}</td>
+        <td class="num">${fmt$(r.payment)}</td>
+        <td class="num num-green">${fmt$(r.principal)}</td>
+        <td class="num ${r.interest > r.principal ? 'num-amber' : 'num-dim'}">${fmt$(r.interest)}</td>
+        <td class="num">${fmt$(r.balance)}</td>
+        <td>${noteHtml}</td>
+      </tr>`;
+    });
+
+    tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;font-family:var(--mono);font-size:11px;">No data</td></tr>';
+  } catch (e) {
+    console.error('renderAmortTableFiltered failed:', e);
+    const tbody = document.getElementById('amort-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:var(--amber);padding:12px;font-family:var(--mono);">Unable to render. Please refresh.</td></tr>';
+  }
+}
+
+function onStrategyChange() {
+  const val = document.getElementById('global-strategy').value;
+  const tabBtn = document.querySelector(`#repay-tabs .ptab[onclick*="${val}"]`);
+  if (tabBtn) {
+    currentRepayTab = val;
+    document.querySelectorAll('#repay-tabs .ptab').forEach(b => b.classList.remove('active'));
+    tabBtn.classList.add('active');
+    renderAmortTable();
+  }
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-collapsed');
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR NAVIGATION
+═══════════════════════════════════════ */
+const VIEW_CLASSES = ['dash-view','view-loantrackerpage','view-pricingwindowpage','view-liveratespage','view-strategygrid-page','view-lenderdatapage','view-arbspreadspage','view-cashflowmappage','view-notificationspage'];
+
+function navTo(view, el) {
+  // Update active sidebar item
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  // Remove all view classes from body
+  VIEW_CLASSES.forEach(c => document.body.classList.remove(c));
+
+  // Hide all view-sections and solo panels
+  document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.solo-panel').forEach(v => v.style.display = 'none');
+
+  switch(view) {
+    case 'dashboard':
+      document.body.classList.add('dash-view');
+      break;
+
+    case 'loantracker':
+      document.body.classList.add('view-loantrackerpage');
+      document.querySelector('.solo-panel.lt-solo').style.display = 'block';
+      // Clone loan tracker content into solo panel
+      const ltBody = document.getElementById('lt-solo-body');
+      ltBody.innerHTML = document.getElementById('panel-a').querySelector('.panel-body').innerHTML;
+      break;
+
+    case 'pricingwindow':
+      document.body.classList.add('view-pricingwindowpage');
+      document.querySelector('.solo-panel.pw-solo').style.display = 'block';
+      const pwBody = document.getElementById('pw-solo-body');
+      pwBody.innerHTML = document.getElementById('panel-b').querySelector('.panel-body').innerHTML;
+      break;
+
+    case 'liverates':
+      document.body.classList.add('view-liveratespage');
+      document.querySelector('.solo-panel.lr-solo').style.display = 'block';
+      const lrBody = document.getElementById('lr-solo-body');
+      lrBody.innerHTML = document.getElementById('panel-c').querySelector('.panel-body').innerHTML;
+      break;
+
+    case 'strategygrid':
+      document.body.classList.add('view-strategygrid-page');
+      document.getElementById('view-strategygrid').classList.add('active');
+      renderStrategyGrid();
+      break;
+
+    case 'lenderdata':
+      document.body.classList.add('view-lenderdatapage');
+      document.getElementById('view-lenderdata').classList.add('active');
+      renderLenderData();
+      break;
+
+    case 'arbspreads':
+      document.body.classList.add('view-arbspreadspage');
+      document.querySelector('.solo-panel.as-solo').style.display = 'block';
+      const asBody = document.getElementById('as-solo-body');
+      asBody.innerHTML = document.getElementById('panel-d').querySelector('.panel-body').innerHTML;
+      break;
+
+    case 'cashflowmap':
+      document.body.classList.add('view-cashflowmappage');
+      document.querySelector('.solo-panel.cf-solo').style.display = 'block';
+      const cfBody = document.getElementById('cf-solo-body');
+      cfBody.innerHTML = document.getElementById('panel-f').querySelector('.panel-body').innerHTML;
+      break;
+
+    case 'notifications':
+      document.body.classList.add('view-notificationspage');
+      document.getElementById('view-notifications').classList.add('active');
+      renderNotifications();
+      break;
+  }
+}
+
+function renderStrategyGrid() {
+  const snowballOrder = [...LOANS].sort((a,b) => a.balance - b.balance);
+  const avalancheOrder = [...LOANS].sort((a,b) => b.rate - a.rate);
+
+  function stratTable(loans, label) {
+    let html = `<table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
+      <thead><tr style="border-bottom:1px solid var(--panel-border);">
+        <th style="text-align:left;padding:6px 8px;color:var(--text-muted);">PRIORITY</th>
+        <th style="text-align:left;padding:6px 8px;color:var(--text-muted);">LOAN</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">BALANCE</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">RATE</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">MONTHLY</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text-muted);">PAYOFF</th>
+      </tr></thead><tbody>`;
+    loans.forEach((l,i) => {
+      const r = l.rate/12/100, n = l.termMonths;
+      const M = r > 0 ? l.balance * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1) : l.balance/n;
+      const totalInt = M*n - l.balance;
+      html += `<tr style="border-bottom:1px solid var(--panel-border);">
+        <td style="padding:6px 8px;color:var(--green);">${String(i+1).padStart(2,'0')}</td>
+        <td style="padding:6px 8px;color:var(--text-primary);">${l.label}</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--amber);">$${l.balance.toLocaleString()}</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--text-secondary);">${l.rate}%</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--green);">$${M.toFixed(2)}</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--text-muted);">${n} mo</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    return html;
+  }
+
+  document.getElementById('sg-snowball').innerHTML = stratTable(snowballOrder,'snowball');
+  document.getElementById('sg-avalanche').innerHTML = stratTable(avalancheOrder,'avalanche');
+
+  // Comparison
+  let snowInt = 0, avalInt = 0;
+  snowballOrder.forEach(l => { const r=l.rate/12/100,n=l.termMonths; const M=r>0?l.balance*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):l.balance/n; snowInt+=M*n-l.balance; });
+  avalancheOrder.forEach(l => { const r=l.rate/12/100,n=l.termMonths; const M=r>0?l.balance*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):l.balance/n; avalInt+=M*n-l.balance; });
+  const saved = snowInt - avalInt;
+  document.getElementById('sg-comparison').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:12px;">
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:22px;color:var(--text-secondary);">$${snowInt.toFixed(0)}</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Snowball Total Interest</div></div>
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:22px;color:var(--green);">$${avalInt.toFixed(0)}</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Avalanche Total Interest</div></div>
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:22px;color:var(--green);">$${Math.abs(saved).toFixed(0)}</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Interest Saved w/ Avalanche</div></div>
+    </div>`;
+}
+
+function renderLenderData() {
+  const lenders = [
+    { name:'Sallie Mae', type:'Private Student', min:4.50, max:14.99, term:180, note:'Variable or fixed' },
+    { name:'Earnest', type:'Private Student', min:4.43, max:15.90, term:180, note:'No fees' },
+    { name:'SoFi', type:'Student Refi', min:4.74, max:9.99, term:240, note:'Career coaching included' },
+    { name:'Navient', type:'Federal Servicer', min:3.73, max:7.54, term:120, note:'IDR plans available' },
+    { name:'Chase Auto', type:'Auto', min:5.99, max:12.99, term:72, note:'New & used' },
+    { name:'Capital One', type:'Auto', min:6.24, max:13.49, term:72, note:'Pre-qualify online' },
+    { name:'LightStream', type:'Personal', min:7.49, max:25.49, term:84, note:'No origination fee' },
+    { name:'Marcus (Goldman)', type:'Personal', min:6.99, max:24.99, term:72, note:'No fees ever' },
+    { name:'Upstart', type:'Personal', min:7.80, max:35.99, term:60, note:'AI-based underwriting' },
+  ];
+  const tb = document.getElementById('lender-table-body');
+  tb.innerHTML = lenders.map(l => `
+    <tr style="border-bottom:1px solid var(--panel-border);">
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--text-primary);">${l.name}</td>
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--text-secondary);">${l.type}</td>
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--green);text-align:right;">${l.min}%</td>
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--amber);text-align:right;">${l.max}%</td>
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);text-align:right;">${l.term} mo</td>
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:11px;color:var(--text-muted);">${l.note}</td>
+    </tr>`).join('');
+}
+
+function getLoanWarningsAdv(loan) {
+  const warnings = [];
+  if (loan.rate > 15) warnings.push({ level: 'danger', color: 'var(--amber)', icon: '⚠', msg: `${loan.label}: Very high rate (${loan.rate}%) — refinancing recommended` });
+  else if (loan.rate > 10) warnings.push({ level: 'caution', color: '#FDE047', icon: '⚠', msg: `${loan.label}: High rate (${loan.rate}%) — explore refinancing` });
+
+  const pctPaid = (loan.principal - loan.balance) / loan.principal;
+  if (pctPaid < 0.05 && loan.termMonths > 60) warnings.push({ level: 'info', color: '#60A5FA', icon: 'ℹ', msg: `${loan.label}: Minimal progress — consider extra payments` });
+
+  const totalCost = loan.monthlyPayment * loan.termMonths;
+  const interestRatio = (totalCost - loan.principal) / loan.principal;
+  if (interestRatio > 0.5) warnings.push({ level: 'caution', color: '#FDE047', icon: '⚠', msg: `${loan.label}: Total interest exceeds 50% of principal ($${Math.round(totalCost - loan.principal).toLocaleString()})` });
+
+  if (loan.balance > loan.principal) warnings.push({ level: 'danger', color: 'var(--red)', icon: '⚠', msg: `${loan.label}: Balance exceeds principal — possible negative amortization` });
+  if (loan.rate === 0) warnings.push({ level: 'info', color: '#60A5FA', icon: 'ℹ', msg: `${loan.label}: 0% interest — verify this is correct` });
+
+  return warnings;
+}
+
+function renderNotifications() {
+  // Dynamic loan warnings at top
+  const loanWarnings = [];
+  LOANS.forEach(loan => {
+    getLoanWarningsAdv(loan).forEach(w => loanWarnings.push(w));
+  });
+
+  const staticNotifs = [
+    { type:'alert', color:'var(--amber)', icon:'⚠', title:'Payment Due Soon', msg:'Car Loan payment of $248.85 is due in 5 days (Feb 1).', time:'Just now' },
+    { type:'tip', color:'var(--green)', icon:'↓', title:'Refinancing Opportunity', msg:'Your Car Loan rate (8.9%) is above market. Refinancing could save $892 lifetime.', time:'2 hours ago' },
+    { type:'win', color:'var(--green)', icon:'✓', title:'Milestone Unlocked', msg:'3-Month Streak! You\'ve made 3 consecutive on-time payments.', time:'Yesterday' },
+    { type:'info', color:'var(--text-secondary)', icon:'i', title:'Federal Rate Update', msg:'Federal student loan rates held steady at 5.50% for this semester.', time:'3 days ago' },
+    { type:'info', color:'var(--text-secondary)', icon:'i', title:'Avalanche Tip', msg:'Paying an extra $100/month on your Personal Loan saves $412 in interest.', time:'1 week ago' },
+  ];
+
+  let html = '';
+
+  // Render dynamic loan warnings first
+  if (loanWarnings.length > 0) {
+    html += `<div style="padding:8px 10px;background:rgba(245,158,11,0.05);border-bottom:1px solid var(--panel-border);">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Loan-Specific Alerts</div>
+      ${loanWarnings.map(w => `
+        <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(34,197,94,0.06);align-items:center;">
+          <span style="font-size:11px;color:${w.color};flex-shrink:0;">${w.icon}</span>
+          <span style="font-family:var(--sans);font-size:11px;color:${w.color};">${w.msg}</span>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  html += staticNotifs.map(n => `
+    <div style="display:flex;gap:12px;padding:12px;border-bottom:1px solid var(--panel-border);align-items:flex-start;">
+      <div style="width:28px;height:28px;border-radius:50%;background:${n.color}22;border:1px solid ${n.color};display:flex;align-items:center;justify-content:center;font-size:12px;color:${n.color};flex-shrink:0;">${n.icon}</div>
+      <div style="flex:1;">
+        <div style="font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">${n.title}</div>
+        <div style="font-family:var(--sans);font-size:11px;color:var(--text-secondary);">${n.msg}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);flex-shrink:0;">${n.time}</div>
+    </div>`).join('');
+
+  document.getElementById('notif-list').innerHTML = html;
+}
+
+function showApplyToast(loanName, lender, monthly) {
+  try {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast success';
+    const monthlySavings = isFinite(parseFloat(monthly)) ? parseFloat(monthly).toFixed(2) : '0.00';
+    // Escape user-supplied strings before innerHTML insertion
+    const safeName   = escapeHtml(loanName);
+    const safeLender = escapeHtml(lender);
+    toast.innerHTML = `
+      <div class="toast-title">Application Started</div>
+      <div style="font-size:10px;color:var(--text-secondary);margin-bottom:2px;">${safeName} &rarr; ${safeLender}</div>
+      <div style="font-size:10px;color:var(--text-muted);">Est. savings: <span style="color:var(--green);">+$${monthlySavings}</span> / mo</div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  } catch (e) {
+    console.error('showApplyToast failed:', e);
+  }
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init() {
+  renderLoanTracker();
+  renderAmortTable();
+  renderStackedBar();
+  renderRefiTable();
+  renderSpreadChart();
+  renderBalanceChart();
+  renderCashFlowMap();
+  renderTicker();
+  updateThemeIcon();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

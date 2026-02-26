@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Education Hub — LifeLaunch Loans</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:            #080F0A;
+      --bg2:           #0D1A10;
+      --surface:       #0F1F13;
+      --surface2:      #162A1A;
+      --border:        rgba(34,197,94,0.12);
+      --green:         #22C55E;
+      --green-dim:     #16A34A;
+      --green-glow:    rgba(34,197,94,0.15);
+      --text-primary:  #F0FDF4;
+      --text-secondary:#86EFAC;
+      --text-muted:    rgba(74,222,128,0.4);
+      --amber:         #F59E0B;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; }
+    img, svg { display: block; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+    .chip {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.3rem 0.9rem;
+      margin-bottom: 1.2rem;
+    }
+    .section-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 580px;
+    }
+    .btn-green {
+      display: inline-block;
+      background: var(--green);
+      color: #080F0A;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 0 20px rgba(34,197,94,0.35);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-green:hover { background: #28d968; box-shadow: 0 0 32px rgba(34,197,94,0.55); transform: translateY(-2px); }
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover { border-color: var(--green); color: var(--green); }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(34,197,94,0.35); }
+      50%       { box-shadow: 0 0 38px rgba(34,197,94,0.65); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      padding: 1rem 0;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(8,15,10,0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.55rem; flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 14px rgba(34,197,94,0.4);
+    }
+    .nav-logo-icon svg { width: 18px; height: 18px; }
+    .nav-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      display: flex; align-items: baseline; gap: 0.22rem;
+    }
+    .nav-logo-text .bold  { font-weight: 800; color: var(--text-primary); }
+    .nav-logo-text .light { font-weight: 400; color: var(--text-secondary); }
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.9rem; color: var(--text-secondary); transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--green); }
+    .nav-links a.active { color: var(--green); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-signin {
+      font-size: 0.9rem; color: var(--text-secondary);
+      padding: 0.5rem 1rem; border-radius: 6px;
+      border: 1px solid transparent; background: transparent; transition: all 0.2s;
+    }
+    .nav-signin:hover { border-color: var(--border); color: var(--text-primary); }
+    .nav-cta { font-size: 0.85rem; padding: 0.55rem 1.1rem; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text-primary); border-radius: 2px; transition: all 0.2s;
+    }
+
+    /* ── HERO ── */
+    #edu-hero {
+      padding: 9rem 0 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg-glow {
+      position: absolute;
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse at center, rgba(34,197,94,0.11) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-dot-grid {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(34,197,94,0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+    .edu-hero-inner {
+      position: relative; z-index: 1;
+      text-align: center;
+    }
+    .edu-hero-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1.08;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .edu-hero-headline .accent { color: var(--green); }
+    .edu-hero-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+      line-height: 1.7;
+    }
+    .edu-hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .edu-stat {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .edu-stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.7rem; font-weight: 500; color: var(--green);
+    }
+    .edu-stat-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;
+    }
+    .edu-stat-divider {
+      width: 1px; height: 44px; background: var(--border);
+    }
+
+    /* ── TOPIC CARDS GRID ── */
+    #topics { padding: 5rem 0; background: var(--bg2); }
+    .topics-header { text-align: center; margin-bottom: 3rem; }
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    .topic-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .topic-card:hover {
+      background: var(--surface2);
+      border-color: rgba(34,197,94,0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(34,197,94,0.08);
+    }
+    .topic-card.open {
+      border-color: var(--green);
+      background: var(--surface2);
+    }
+    .topic-icon {
+      width: 46px; height: 46px;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .topic-icon svg { width: 22px; height: 22px; }
+    .topic-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      color: var(--text-primary); margin-bottom: 0.45rem;
+    }
+    .topic-teaser {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 0.86rem;
+      color: var(--text-secondary); line-height: 1.6;
+      margin-bottom: 1.1rem;
+    }
+    .learn-more-btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem; font-weight: 500;
+      color: var(--green);
+      background: none; border: none; padding: 0;
+      cursor: pointer; transition: gap 0.2s;
+    }
+    .learn-more-btn:hover { gap: 0.55rem; }
+    .topic-chevron {
+      width: 16px; height: 16px;
+      transition: transform 0.3s ease;
+    }
+    .topic-card.open .topic-chevron { transform: rotate(180deg); }
+
+    /* ── EXPANDED ARTICLE ── */
+    .topic-article {
+      display: none;
+      grid-column: 1 / -1;
+      background: var(--surface);
+      border: 1px solid var(--green);
+      border-radius: 14px;
+      padding: 2.5rem;
+      margin-top: 0.4rem;
+      animation: fadeUp 0.3s ease both;
+    }
+    .topic-article.open { display: block; }
+    .article-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.5rem;
+      color: var(--text-primary); margin-bottom: 1.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 0.95rem;
+      color: var(--text-secondary); line-height: 1.8;
+    }
+    .article-body h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.05rem;
+      color: var(--text-primary); margin: 1.8rem 0 0.7rem;
+    }
+    .article-body p { margin-bottom: 1rem; }
+    .article-body ul { padding-left: 1.3rem; margin-bottom: 1rem; }
+    .article-body li { margin-bottom: 0.45rem; }
+    .article-body strong { color: var(--text-primary); font-weight: 500; }
+
+    /* Warning box */
+    .warn-box {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-left: 4px solid var(--amber);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1.2rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--amber);
+    }
+    .warn-box strong { color: var(--amber); }
+
+    /* Info box */
+    .info-box {
+      background: var(--green-glow);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-left: 4px solid var(--green);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1.2rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* Comparison table inside article */
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.4rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+    }
+    .comp-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      background: var(--surface2);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .comp-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table tr:hover td { background: var(--surface2); }
+    .comp-table td.highlight { color: var(--green); font-weight: 500; }
+    .comp-table td.amber { color: var(--amber); }
+    .comp-table td.label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+    }
+
+    /* Interactive calc inside article */
+    .calc-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.4rem 0;
+    }
+    .calc-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.95rem;
+      color: var(--text-primary); margin-bottom: 1.1rem;
+    }
+    .calc-row {
+      display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.9rem;
+    }
+    .calc-field { flex: 1; min-width: 160px; }
+    .calc-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-bottom: 0.35rem; display: block;
+    }
+    .calc-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.6rem 0.9rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .calc-input:focus { border-color: var(--green); }
+    .calc-btn {
+      background: var(--green);
+      color: #080F0A;
+      border: none;
+      border-radius: 7px;
+      padding: 0.65rem 1.3rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.3rem;
+    }
+    .calc-btn:hover { background: #28d968; transform: translateY(-1px); }
+    .calc-result {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-top: 0.9rem;
+      display: none;
+    }
+    .calc-result.show { display: block; }
+    .calc-result-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .calc-result-row:last-child { border-bottom: none; }
+    .calc-result-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem; color: var(--text-muted);
+    }
+    .calc-result-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1rem; color: var(--green);
+    }
+    .calc-result-val.amber { color: var(--amber); }
+
+    /* PSLF Checklist */
+    .checklist {
+      list-style: none;
+      margin: 1rem 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li.checked { color: var(--text-primary); }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      margin-top: 1px;
+    }
+    .checklist li.checked .check-box {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .check-box svg { display: none; }
+    .checklist li.checked .check-box svg { display: block; }
+
+    /* ── GLOSSARY ── */
+    #glossary { padding: 6rem 0; background: var(--bg); }
+    .glossary-header { text-align: center; margin-bottom: 2.5rem; }
+    .glossary-search-wrap {
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      position: relative;
+    }
+    .glossary-search {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 1rem 0.8rem 2.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .glossary-search:focus { border-color: var(--green); }
+    .glossary-search::placeholder { color: var(--text-muted); }
+    .search-icon {
+      position: absolute;
+      left: 0.85rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.7rem;
+    }
+    .glossary-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      transition: border-color 0.2s;
+    }
+    .glossary-item:hover { border-color: rgba(34,197,94,0.25); }
+    .glossary-item.hidden { display: none; }
+    .glossary-term {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem; font-weight: 500;
+      color: var(--green); margin-bottom: 0.3rem;
+    }
+    .glossary-def {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 0.85rem;
+      color: var(--text-secondary); line-height: 1.6;
+    }
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      padding: 2rem 0;
+      display: none;
+    }
+
+    /* ── QUIZ ── */
+    #quiz { padding: 6rem 0; background: var(--bg2); }
+    .quiz-header { text-align: center; margin-bottom: 3rem; }
+    .quiz-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .quiz-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+    }
+    .quiz-progress-bar-wrap {
+      background: rgba(34,197,94,0.08);
+      border-radius: 4px;
+      height: 4px;
+      margin-bottom: 1.8rem;
+      overflow: hidden;
+    }
+    .quiz-progress-bar {
+      height: 100%;
+      background: var(--green);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .quiz-q-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.6rem;
+    }
+    .quiz-question {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.15rem;
+      color: var(--text-primary); margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+    .quiz-options {
+      display: flex; flex-direction: column; gap: 0.65rem;
+    }
+    .quiz-option {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0.85rem 1.1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .quiz-option:hover:not(:disabled) {
+      border-color: rgba(34,197,94,0.3);
+      color: var(--text-primary);
+      background: var(--surface2);
+    }
+    .quiz-option.correct {
+      border-color: var(--green);
+      background: rgba(34,197,94,0.1);
+      color: var(--text-primary);
+    }
+    .quiz-option.wrong {
+      border-color: rgba(239,68,68,0.5);
+      background: rgba(239,68,68,0.07);
+      color: rgba(252,165,165,0.8);
+    }
+    .quiz-option:disabled { cursor: default; }
+    .quiz-feedback {
+      margin-top: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      min-height: 1.4rem;
+    }
+    .quiz-feedback.correct-fb { color: var(--green); }
+    .quiz-feedback.wrong-fb { color: #f87171; }
+    .quiz-next-btn {
+      margin-top: 1.4rem;
+      background: var(--green);
+      color: #080F0A;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.92rem;
+      cursor: pointer;
+      display: none;
+      transition: all 0.2s;
+    }
+    .quiz-next-btn:hover { background: #28d968; transform: translateY(-1px); }
+    .quiz-next-btn.show { display: inline-block; }
+
+    /* Quiz Score */
+    .quiz-score-card {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .quiz-score-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 3.5rem; font-weight: 500;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .quiz-score-num.green { color: var(--green); }
+    .quiz-score-num.amber { color: var(--amber); }
+    .quiz-score-label {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.3rem;
+      color: var(--text-primary); margin-bottom: 0.7rem;
+    }
+    .quiz-score-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 0.92rem;
+      color: var(--text-secondary); margin-bottom: 1.8rem;
+    }
+    .quiz-retake-btn {
+      background: transparent;
+      color: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 0.7rem 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .quiz-retake-btn:hover { background: var(--green-glow); transform: translateY(-1px); }
+
+    /* ── FOOTER ── */
+    #footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 4rem 0 0;
+    }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    .footer-brand-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 0.85rem;
+      color: var(--text-secondary); line-height: 1.7;
+      margin: 1rem 0 1.4rem; max-width: 240px;
+    }
+    .footer-socials { display: flex; gap: 0.75rem; }
+    .social-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .social-icon:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+    .social-icon svg { width: 16px; height: 16px; }
+    .footer-col-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.88rem;
+      color: var(--text-primary); margin-bottom: 1.1rem;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li + li { margin-top: 0.7rem; }
+    .footer-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; color: var(--text-secondary); transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--green); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding: 1.4rem 0;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.8rem;
+    }
+    .footer-copy {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .hackathon-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--green-glow);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; color: var(--green);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .topics-grid { grid-template-columns: repeat(2, 1fr); }
+      .glossary-grid { grid-template-columns: 1fr; }
+      .footer-main { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-actions { display: none; }
+      .nav-hamburger { display: flex; }
+      .topics-grid { grid-template-columns: 1fr; }
+      .footer-main { grid-template-columns: 1fr; }
+      .edu-hero-stats { flex-direction: column; gap: 1.2rem; }
+      .edu-stat-divider { display: none; }
+      .comp-table { font-size: 0.78rem; }
+      .comp-table th, .comp-table td { padding: 0.6rem 0.7rem; }
+    }
+
+    /* ── THEME TOGGLE BUTTON ── */
+    .theme-toggle {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+    /* ── LIGHT MODE OVERRIDES ── */
+    body.light-mode {
+      --bg:             #F4F9F4;
+      --bg2:            #EBF5EB;
+      --surface:        #FFFFFF;
+      --surface2:       #E8F5E8;
+      --border:         rgba(22,163,74,0.2);
+      --green:          #16A34A;
+      --green-dim:      #15803D;
+      --green-glow:     rgba(22,163,74,0.12);
+      --panel-border:   rgba(22,163,74,0.2);
+      --text-primary:   #0F1F0F;
+      --text-secondary: #166534;
+      --text-muted:     rgba(22,101,52,0.6);
+      --amber:          #B45309;
+    }
+    body.light-mode { background: var(--bg); color: var(--text-primary); }
+
+    body.light-mode nav,
+    body.light-mode #navbar { background: rgba(244,249,244,0.95) !important; border-bottom-color: rgba(22,163,74,0.15) !important; }
+
+    body.light-mode #navbar.scrolled { background: rgba(244,249,244,0.95) !important; }
+
+    body.light-mode input,
+    body.light-mode select,
+    body.light-mode textarea {
+      background: #FFFFFF !important;
+      color: #0F1F0F !important;
+      border-color: rgba(22,163,74,0.3) !important;
+    }
+    body.light-mode input::placeholder { color: rgba(22,101,52,0.4) !important; }
+
+    body.light-mode .btn-ghost,
+    body.light-mode .nav-signin { color: var(--text-primary) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" aria-label="LifeLaunch Loans home">
+        <div class="nav-logo-icon">
+          <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M9 2L11.5 7H16L12 10.5L13.5 15.5L9 12.5L4.5 15.5L6 10.5L2 7H6.5L9 2Z" fill="#080F0A"/>
+          </svg>
+        </div>
+        <span class="nav-logo-text">
+          <span class="bold">LifeLaunch</span><span class="light">Loans</span>
+        </span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="education.html" class="active">Education</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="signin.html">Sign In</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="signin.html" class="nav-signin">Sign In</a>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+        <a href="dashboard.html" class="btn-green nav-cta">Back to Dashboard</a>
+      </div>
+
+      <button class="nav-hamburger" aria-label="Toggle mobile menu" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div id="mobile-menu" style="display:none; padding: 1rem 2rem 1.5rem; background: rgba(8,15,10,0.95); border-top: 1px solid var(--border);">
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:0.9rem; margin-bottom:1.2rem;">
+        <li><a href="index.html" style="color:var(--text-secondary); font-size:0.95rem;">Home</a></li>
+        <li><a href="education.html" style="color:var(--green); font-size:0.95rem;">Education</a></li>
+        <li><a href="dashboard.html" style="color:var(--text-secondary); font-size:0.95rem;">Dashboard</a></li>
+        <li><a href="signin.html" style="color:var(--text-secondary); font-size:0.95rem;">Sign In</a></li>
+      </ul>
+      <div style="display:flex; gap:0.75rem;">
+        <a href="signin.html" class="btn-ghost" style="flex:1; text-align:center;">Sign In</a>
+        <a href="dashboard.html" class="btn-green" style="flex:1; text-align:center;">Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="edu-hero">
+    <div class="hero-bg-glow" aria-hidden="true"></div>
+    <div class="hero-dot-grid" aria-hidden="true"></div>
+    <div class="container edu-hero-inner">
+      <div class="chip">FREE FINANCIAL LITERACY</div>
+      <h1 class="edu-hero-headline">Know Your Loans.<br><span class="accent">Own Your Future.</span></h1>
+      <p class="edu-hero-sub">Free financial literacy resources built for the generation carrying America's $1.7 trillion student debt.</p>
+      <div class="edu-hero-stats">
+        <div class="edu-stat">
+          <span class="edu-stat-num">43M</span>
+          <span class="edu-stat-label">Americans with student debt</span>
+        </div>
+        <div class="edu-stat-divider" aria-hidden="true"></div>
+        <div class="edu-stat">
+          <span class="edu-stat-num">$37,338</span>
+          <span class="edu-stat-label">average balance</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPIC CARDS -->
+  <section id="topics" aria-labelledby="topics-headline">
+    <div class="container">
+      <div class="topics-header reveal">
+        <div class="chip">6 GUIDES</div>
+        <h2 class="section-headline" id="topics-headline">Everything you need to know.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Click any topic to read the full guide inline — no page reload required.</p>
+      </div>
+
+      <div class="topics-grid" id="topics-grid">
+
+        <!-- Card 1: APR vs Interest Rate -->
+        <article class="topic-card reveal" id="card-1" onclick="toggleTopic(1)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="topic-title">Understanding APR vs Interest Rate</div>
+          <p class="topic-teaser">APR and interest rate sound alike — but the difference can cost you thousands.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Card 2: Federal vs Private -->
+        <article class="topic-card reveal" id="card-2" onclick="toggleTopic(2)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="topic-title">Federal vs Private Loans</div>
+          <p class="topic-teaser">Not all student loans are created equal — the type you choose shapes your entire repayment journey.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Card 3: IDR Plans -->
+        <article class="topic-card reveal" id="card-3" onclick="toggleTopic(3)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="topic-title">Income-Driven Repayment (IDR) Plans</div>
+          <p class="topic-teaser">Pay based on what you earn, not what you owe — and get forgiveness after 20–25 years.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Card 4: PSLF -->
+        <article class="topic-card reveal" id="card-4" onclick="toggleTopic(4)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+          </div>
+          <div class="topic-title">Public Service Loan Forgiveness (PSLF)</div>
+          <p class="topic-teaser">Work for the government or a nonprofit? 10 years of payments and your balance vanishes.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Card 5: Credit Score -->
+        <article class="topic-card reveal" id="card-5" onclick="toggleTopic(5)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+          <div class="topic-title">Credit Score &amp; Loans</div>
+          <p class="topic-teaser">Every loan application and missed payment leaves a mark — here's exactly how your score works.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Card 6: Repayment Strategies -->
+        <article class="topic-card reveal" id="card-6" onclick="toggleTopic(6)" role="button" tabindex="0" aria-expanded="false">
+          <div class="topic-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+            </svg>
+          </div>
+          <div class="topic-title">Snowball vs Avalanche vs Standard</div>
+          <p class="topic-teaser">Three strategies, three outcomes — see which one saves the most money with real numbers.</p>
+          <button class="learn-more-btn" tabindex="-1">
+            Learn More
+            <svg class="topic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </article>
+
+        <!-- Article 1: APR vs Interest Rate -->
+        <div class="topic-article" id="article-1" aria-hidden="true">
+          <div class="article-title">Understanding APR vs Interest Rate</div>
+          <div class="article-body">
+            <p>When you take out a loan, you'll see two percentages thrown around: the <strong>interest rate</strong> and the <strong>APR (Annual Percentage Rate)</strong>. They are not the same thing — and confusing them can cost you real money.</p>
+
+            <h3>Interest Rate: The Base Cost</h3>
+            <p>The interest rate is simply the cost of borrowing the principal. It doesn't include any additional fees. If you borrow $30,000 at a 5.5% interest rate, that 5.5% is applied to your outstanding balance each year to calculate how much interest you owe each month.</p>
+
+            <h3>APR: The Full Picture</h3>
+            <p>APR includes the interest rate <em>plus</em> all additional fees the lender charges — origination fees, closing costs, and other charges expressed as a yearly rate. This is why APR is always equal to or higher than the interest rate. It's the true cost of the loan.</p>
+
+            <div class="info-box">
+              <strong>Example:</strong> A $30,000 loan with a 5.5% interest rate but $2,100 in origination fees (7%) works out to approximately a 6.2% APR over 10 years. That extra 0.7% doesn't sound like much — but see the real-dollar difference below.
+            </div>
+
+            <h3>Real-Dollar Difference on a $30,000 Loan (10-Year Term)</h3>
+            <table class="comp-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Interest Rate Only (5.5%)</th>
+                  <th>APR (6.2%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">Monthly Payment</td><td>$325.14</td><td class="amber">$336.22</td></tr>
+                <tr><td class="label">Total Interest Paid</td><td>$9,016.80</td><td class="amber">$10,346.40</td></tr>
+                <tr><td class="label">Upfront Fees</td><td>$0</td><td class="amber">$2,100</td></tr>
+                <tr><td class="label">True Total Cost</td><td class="highlight">$39,016.80</td><td class="amber">$42,446.40</td></tr>
+              </tbody>
+            </table>
+            <p>The difference: <strong style="color:var(--amber);">$3,429.60</strong> — almost the price of a used car. Always compare APR, not just the interest rate, when shopping for loans.</p>
+
+            <h3>Interactive Calculator: APR vs Rate</h3>
+            <div class="calc-box">
+              <div class="calc-title">Compare APR vs Interest Rate Cost</div>
+              <div class="calc-row">
+                <div class="calc-field">
+                  <label class="calc-label" for="apr-amount">Loan Amount ($)</label>
+                  <input class="calc-input" type="number" id="apr-amount" value="30000" min="1000" max="500000" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="apr-rate">Interest Rate (%)</label>
+                  <input class="calc-input" type="number" id="apr-rate" value="5.5" min="0.1" max="30" step="0.1" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="apr-apr">APR (%)</label>
+                  <input class="calc-input" type="number" id="apr-apr" value="6.2" min="0.1" max="30" step="0.1" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="apr-term">Term (months)</label>
+                  <input class="calc-input" type="number" id="apr-term" value="120" min="12" max="360" />
+                </div>
+              </div>
+              <button class="calc-btn" onclick="calcAPR()">Calculate Difference</button>
+              <div class="calc-result" id="apr-result">
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Monthly (Interest Rate)</span>
+                  <span class="calc-result-val" id="apr-monthly-rate">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Monthly (APR)</span>
+                  <span class="calc-result-val amber" id="apr-monthly-apr">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Total Interest (Rate)</span>
+                  <span class="calc-result-val" id="apr-total-rate">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Total Interest (APR)</span>
+                  <span class="calc-result-val amber" id="apr-total-apr">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Extra Cost of Fees</span>
+                  <span class="calc-result-val amber" id="apr-diff">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Article 2: Federal vs Private -->
+        <div class="topic-article" id="article-2" aria-hidden="true">
+          <div class="article-title">Federal vs Private Loans</div>
+          <div class="article-body">
+            <p>Before you sign anything, you need to understand whether you're taking out a federal student loan or a private one. This single choice affects your payment options, forgiveness eligibility, and financial safety net for the entire life of the loan.</p>
+
+            <h3>Side-by-Side Comparison</h3>
+            <table class="comp-table">
+              <thead>
+                <tr><th>Feature</th><th>Federal Loans</th><th>Private Loans</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">Interest Rates</td><td class="highlight">Fixed (set by Congress)</td><td class="amber">Fixed or Variable</td></tr>
+                <tr><td class="label">Income-Driven Repayment</td><td class="highlight">Yes — IBR, PAYE, SAVE, ICR</td><td class="amber">No</td></tr>
+                <tr><td class="label">Loan Forgiveness</td><td class="highlight">Yes — PSLF, IDR forgiveness</td><td class="amber">No</td></tr>
+                <tr><td class="label">Deferment / Forbearance</td><td class="highlight">Generous options available</td><td class="amber">Limited, lender discretion</td></tr>
+                <tr><td class="label">Credit Check Required</td><td class="highlight">No (subsidized/unsubsidized)</td><td class="amber">Yes — affects approval &amp; rate</td></tr>
+                <tr><td class="label">Borrowing Limits</td><td>$27,000–$57,500 undergrad</td><td class="highlight">Up to cost of attendance</td></tr>
+                <tr><td class="label">Origination Fees (2024)</td><td class="amber">~1.057% (Direct loans)</td><td>Varies — often 0%</td></tr>
+                <tr><td class="label">Parent PLUS available</td><td class="highlight">Yes</td><td class="highlight">Yes</td></tr>
+              </tbody>
+            </table>
+
+            <h3>When to Choose Federal Loans</h3>
+            <p>Federal loans should always be your first choice. They offer government-backed protections that private lenders simply cannot match: income-driven repayment that caps your payment at 10–20% of discretionary income, multiple forgiveness pathways, and generous deferment options if you lose your job or go back to school.</p>
+
+            <h3>When Private Loans Make Sense</h3>
+            <p>Private loans may be worth considering only after you have exhausted your federal loan eligibility. Situations where they can help: you're a graduate student who has hit federal caps, you have excellent credit and can secure a lower rate than federal, or you need to cover the gap between federal limits and the cost of attendance.</p>
+
+            <div class="warn-box">
+              <strong>Warning:</strong> Never take private loans before exhausting your federal options. Once you go private, you lose access to income-driven repayment, PSLF, and federal deferment protections — permanently, for that loan.
+            </div>
+
+            <h3>Subsidized vs Unsubsidized Federal Loans</h3>
+            <p>Within federal loans, there's an important distinction. <strong>Subsidized loans</strong> don't accrue interest while you're in school at least half-time — the government pays it for you. <strong>Unsubsidized loans</strong> start accruing interest from day one. If you can borrow subsidized, do so first; the savings over four years can be significant.</p>
+          </div>
+        </div>
+
+        <!-- Article 3: IDR Plans -->
+        <div class="topic-article" id="article-3" aria-hidden="true">
+          <div class="article-title">Income-Driven Repayment (IDR) Plans</div>
+          <div class="article-body">
+            <p>Income-Driven Repayment plans tie your monthly payment to a percentage of your <strong>discretionary income</strong> rather than your loan balance. After 20 or 25 years of payments, whatever remains is forgiven. For many borrowers, IDR is the most manageable path forward.</p>
+
+            <h3>The Four Plans Explained</h3>
+            <table class="comp-table">
+              <thead>
+                <tr><th>Plan</th><th>Payment</th><th>Eligibility</th><th>Forgiveness</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">IBR (Income-Based)</td><td>10–15% discretionary income</td><td>New borrowers after 7/1/2014: 10%. Before: 15%</td><td class="highlight">20–25 years</td></tr>
+                <tr><td class="label">PAYE (Pay As You Earn)</td><td>10% discretionary income</td><td>New borrowers after 10/1/2011; partial financial hardship required</td><td class="highlight">20 years</td></tr>
+                <tr><td class="label">SAVE (Saving on Valuable Education)</td><td>5–10% discretionary income</td><td>All Direct loan borrowers</td><td class="highlight">10–25 years*</td></tr>
+                <tr><td class="label">ICR (Income-Contingent)</td><td>20% discretionary income or 12-year fixed payment, whichever is less</td><td>All Direct loan borrowers</td><td>25 years</td></tr>
+              </tbody>
+            </table>
+            <p style="font-size:0.8rem; color:var(--text-muted);">* SAVE offers forgiveness in as few as 10 years for borrowers with balances under $12,000. Currently subject to legal challenges — check studentaid.gov for current status.</p>
+
+            <h3>How Payments Are Calculated</h3>
+            <p><strong>Discretionary income</strong> is defined as your Adjusted Gross Income (AGI) minus 150% of the federal poverty guideline for your family size and state. Your payment is then 10–20% of that number, divided by 12.</p>
+
+            <div class="info-box">
+              <strong>Example:</strong> You earn $42,000/year. The poverty guideline for a family of 1 is ~$14,580. 150% = $21,870. Discretionary income = $42,000 − $21,870 = $20,130. Under IBR (10%): $20,130 × 0.10 / 12 = <strong style="color:var(--green);">$167.75/month</strong>.
+            </div>
+
+            <h3>IDR Payment Calculator</h3>
+            <div class="calc-box">
+              <div class="calc-title">Estimate Your IDR Payment</div>
+              <div class="calc-row">
+                <div class="calc-field">
+                  <label class="calc-label" for="idr-income">Annual Income (AGI, $)</label>
+                  <input class="calc-input" type="number" id="idr-income" value="42000" min="0" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="idr-family">Family Size</label>
+                  <input class="calc-input" type="number" id="idr-family" value="1" min="1" max="10" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="idr-balance">Loan Balance ($)</label>
+                  <input class="calc-input" type="number" id="idr-balance" value="38000" min="0" />
+                </div>
+              </div>
+              <button class="calc-btn" onclick="calcIDR()">Calculate All Plans</button>
+              <div class="calc-result" id="idr-result">
+                <div class="calc-result-row">
+                  <span class="calc-result-label">IBR (10% — new borrowers)</span>
+                  <span class="calc-result-val" id="idr-ibr">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">PAYE (10%)</span>
+                  <span class="calc-result-val" id="idr-paye">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">SAVE (5% undergrad / 10% grad)</span>
+                  <span class="calc-result-val" id="idr-save">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">ICR (20% discretionary)</span>
+                  <span class="calc-result-val amber" id="idr-icr">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Standard 10-Year (for comparison)</span>
+                  <span class="calc-result-val amber" id="idr-standard">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Article 4: PSLF -->
+        <div class="topic-article" id="article-4" aria-hidden="true">
+          <div class="article-title">Public Service Loan Forgiveness (PSLF)</div>
+          <div class="article-body">
+            <p>PSLF is one of the most powerful — and most misunderstood — student loan programs in existence. If you qualify, it can erase tens of thousands of dollars in federal student loan debt after just 10 years of service. Here's exactly how it works.</p>
+
+            <h3>The Basic Formula</h3>
+            <p>Make <strong>120 qualifying monthly payments</strong> (10 years) on a qualifying repayment plan while working full-time for a qualifying employer. After payment #120, your remaining balance is forgiven — tax-free.</p>
+
+            <h3>Who Qualifies?</h3>
+            <ul>
+              <li><strong>Employer:</strong> U.S. federal, state, local, or tribal government; 501(c)(3) nonprofit organizations; other nonprofits providing qualifying public services.</li>
+              <li><strong>Loan type:</strong> Only Direct Loans qualify. FFEL loans or Perkins Loans must be consolidated into a Direct Consolidation Loan first.</li>
+              <li><strong>Repayment plan:</strong> Must be on an income-driven plan (IBR, PAYE, SAVE, ICR) or the Standard 10-Year plan.</li>
+              <li><strong>Employment:</strong> Full-time (30+ hours/week or employer's definition of full-time, whichever is greater).</li>
+            </ul>
+
+            <h3>Common Mistakes That Delay Forgiveness</h3>
+            <ul>
+              <li>Not submitting an Employment Certification Form (ECF) annually — you should certify every year, not just at the end.</li>
+              <li>Being on the wrong repayment plan (graduated or extended plans don't count).</li>
+              <li>Having the wrong loan type (FFEL loans must be consolidated first).</li>
+              <li>Working part-time instead of meeting the full-time threshold.</li>
+              <li>Assuming for-profit hospital employment counts (it does not; most nonprofit hospitals do count).</li>
+            </ul>
+
+            <div class="info-box">
+              <strong>The PSLF Waiver (2021–2022):</strong> A limited waiver temporarily allowed payments made under any repayment plan and on any loan type to count. This resulted in over $42 billion forgiven for 615,000+ borrowers. While the waiver has expired, the IDR Account Adjustment (ongoing) continues to provide retroactive credit for many borrowers.
+            </div>
+
+            <h3>PSLF Eligibility Checklist</h3>
+            <p>Check off each item to see where you stand:</p>
+            <ul class="checklist" id="pslf-checklist">
+              <li onclick="toggleCheck(this)">
+                <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#080F0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                I work full-time for a qualifying government or nonprofit employer
+              </li>
+              <li onclick="toggleCheck(this)">
+                <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#080F0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                I have Direct Loans (or have consolidated FFEL loans into Direct)
+              </li>
+              <li onclick="toggleCheck(this)">
+                <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#080F0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                I am enrolled in an income-driven repayment plan
+              </li>
+              <li onclick="toggleCheck(this)">
+                <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#080F0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                I have submitted (or plan to submit) my Employment Certification Form
+              </li>
+              <li onclick="toggleCheck(this)">
+                <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#080F0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                I have made or am working toward 120 qualifying monthly payments
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Article 5: Credit Score -->
+        <div class="topic-article" id="article-5" aria-hidden="true">
+          <div class="article-title">Credit Score &amp; Loans</div>
+          <div class="article-body">
+            <p>Your credit score is a three-digit number between 300 and 850 that tells lenders how risky you are to lend to. It determines whether you get approved and at what interest rate. Understanding how it works is essential before you borrow anything.</p>
+
+            <h3>How Loan Applications Affect Your Score</h3>
+            <p>When you apply for a loan, the lender performs a <strong>hard inquiry</strong> on your credit report. Each hard inquiry typically drops your score by about 5 points and stays on your report for 2 years (though the scoring impact fades after ~12 months). Multiple inquiries within a 14–45 day window for the same loan type are often treated as a single inquiry.</p>
+
+            <h3>The 5 Factors of Your Credit Score</h3>
+            <table class="comp-table">
+              <thead>
+                <tr><th>Factor</th><th>Weight</th><th>What It Means</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">Payment History</td><td class="highlight">35%</td><td>On-time payments are the single biggest driver of your score. One 30-day late payment can drop your score 60–110 points.</td></tr>
+                <tr><td class="label">Credit Utilization</td><td class="highlight">30%</td><td>How much of your available revolving credit you're using. Keep it under 30% — ideally under 10%.</td></tr>
+                <tr><td class="label">Length of Credit History</td><td>15%</td><td>Older accounts help. Don't close your oldest credit card even if you don't use it.</td></tr>
+                <tr><td class="label">Credit Mix</td><td>10%</td><td>Having both installment loans (student, auto) and revolving credit (cards) helps slightly.</td></tr>
+                <tr><td class="label">New Credit</td><td class="amber">10%</td><td>Recent applications and new accounts. Avoid opening multiple accounts in a short period.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Debt-to-Income Ratio (DTI)</h3>
+            <p>DTI isn't part of your credit score, but it's critical for loan approval. It measures your total monthly debt payments as a percentage of your gross monthly income. Most lenders want to see a DTI below 36%; some will go up to 43%–50% for mortgages.</p>
+
+            <h3>DTI Calculator</h3>
+            <div class="calc-box">
+              <div class="calc-title">Calculate Your Debt-to-Income Ratio</div>
+              <div class="calc-row">
+                <div class="calc-field">
+                  <label class="calc-label" for="dti-debt">Total Monthly Debt Payments ($)</label>
+                  <input class="calc-input" type="number" id="dti-debt" value="650" min="0" />
+                </div>
+                <div class="calc-field">
+                  <label class="calc-label" for="dti-income">Gross Monthly Income ($)</label>
+                  <input class="calc-input" type="number" id="dti-income" value="4000" min="1" />
+                </div>
+              </div>
+              <button class="calc-btn" onclick="calcDTI()">Calculate DTI</button>
+              <div class="calc-result" id="dti-result">
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Your DTI</span>
+                  <span class="calc-result-val" id="dti-pct">—</span>
+                </div>
+                <div class="calc-result-row">
+                  <span class="calc-result-label">Assessment</span>
+                  <span class="calc-result-val" id="dti-assess">—</span>
+                </div>
+              </div>
+            </div>
+
+            <h3>Credit Score Tips</h3>
+            <ul>
+              <li><strong>Never miss a payment</strong> — set up autopay for at least the minimum on every account.</li>
+              <li><strong>Keep utilization under 30%</strong> — pay down cards before applying for new loans.</li>
+              <li><strong>Don't close old accounts</strong> — they help your average account age and available credit.</li>
+              <li><strong>Rate-shop within 14 days</strong> — multiple auto or student loan inquiries in a short window count as one hard pull.</li>
+              <li><strong>Monitor your report</strong> — check AnnualCreditReport.com for errors; dispute anything inaccurate.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Article 6: Repayment Strategies -->
+        <div class="topic-article" id="article-6" aria-hidden="true">
+          <div class="article-title">Snowball vs Avalanche vs Standard</div>
+          <div class="article-body">
+            <p>If you have multiple loans, choosing the right repayment strategy can save you thousands of dollars and years of debt. Here's a real comparison using three identical loans totaling $50,000.</p>
+
+            <h3>The Three Strategies</h3>
+            <ul>
+              <li><strong>Standard:</strong> Make minimum payments on all loans, paying them down evenly over their original terms.</li>
+              <li><strong>Snowball:</strong> Pay minimums on all loans, then throw every extra dollar at the <em>smallest balance first</em>. When it's gone, roll that payment into the next smallest. Psychologically motivating.</li>
+              <li><strong>Avalanche:</strong> Pay minimums on all loans, then throw every extra dollar at the <em>highest interest rate first</em>. Mathematically optimal — saves the most money.</li>
+            </ul>
+
+            <h3>Example: $50,000 Total Debt (3 Loans, $300/mo Extra Payment)</h3>
+            <table class="comp-table">
+              <thead>
+                <tr><th>Loan</th><th>Balance</th><th>Rate</th><th>Min. Payment</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">Loan A</td><td>$8,000</td><td class="amber">11.5%</td><td>$185</td></tr>
+                <tr><td class="label">Loan B</td><td>$17,000</td><td>7.2%</td><td>$320</td></tr>
+                <tr><td class="label">Loan C</td><td>$25,000</td><td class="highlight">5.5%</td><td>$271</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Strategy Comparison After 5 Years</h3>
+            <table class="comp-table">
+              <thead>
+                <tr><th>Strategy</th><th>Interest Paid (5 yr)</th><th>Remaining Balance</th><th>Loans Paid Off</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="label">Standard (minimums only)</td><td class="amber">$15,840</td><td>$31,200</td><td>0</td></tr>
+                <tr><td class="label">Snowball (+$300/mo)</td><td class="amber">$11,920</td><td>$12,600</td><td>2 (A &amp; B first)</td></tr>
+                <tr><td class="label">Avalanche (+$300/mo)</td><td class="highlight">$10,480</td><td class="highlight">$11,100</td><td class="highlight">2 (A &amp; B first)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="info-box">
+              <strong>Bottom line:</strong> Avalanche saves the most money — $1,440 more than Snowball and $5,360 more than Standard in this example. But if motivation is a challenge, Snowball still crushes Standard and gives you the dopamine hit of seeing loans disappear.
+            </div>
+
+            <h3>Payoff Order Explained</h3>
+            <p><strong>Snowball</strong> targets Loan A first (smallest: $8,000), then Loan B, then Loan C. <strong>Avalanche</strong> also targets Loan A first here (it happens to be both smallest and highest rate), then Loan B (7.2%), then Loan C (5.5%). In this example they attack in the same order — in real scenarios with more divergence between size and rate, Avalanche and Snowball choose different targets.</p>
+
+            <h3>The Standard Plan: When It Makes Sense</h3>
+            <p>Standard repayment makes sense if you're on track for PSLF (more payments = more forgiveness potential), if you have federal subsidized loans and the interest isn't compounding, or if cash flow is too tight to make extra payments. It is not the right choice if you're paying high-rate private debt.</p>
+
+            <p style="margin-top:1.4rem;">
+              <a href="dashboard.html#simulator" style="color:var(--green); font-family:'DM Sans',sans-serif; font-weight:500; display:inline-flex; align-items:center; gap:0.35rem; transition:gap 0.2s;" onmouseover="this.style.gap='0.6rem'" onmouseout="this.style.gap='0.35rem'">
+                Try it in the simulator &#8594;
+              </a>
+            </p>
+          </div>
+        </div>
+
+      </div><!-- /topics-grid -->
+    </div>
+  </section>
+
+  <!-- GLOSSARY -->
+  <section id="glossary" aria-labelledby="glossary-headline">
+    <div class="container">
+      <div class="glossary-header reveal">
+        <div class="chip">QUICK REFERENCE</div>
+        <h2 class="section-headline" id="glossary-headline">Loan Terms Glossary</h2>
+        <p class="section-sub" style="margin: 0 auto;">20 terms every borrower should know. Type to filter.</p>
+      </div>
+      <div class="glossary-search-wrap reveal">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="glossary-search" type="text" id="glossary-search" placeholder="Search terms..." aria-label="Search glossary terms" oninput="filterGlossary()" />
+      </div>
+      <div class="glossary-grid reveal" id="glossary-grid">
+
+        <div class="glossary-item" data-term="APR Annual Percentage Rate">
+          <div class="glossary-term">APR — Annual Percentage Rate</div>
+          <div class="glossary-def">The total yearly cost of a loan expressed as a percentage, including interest and fees. Always higher than or equal to the interest rate alone. The most accurate way to compare loan offers.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Amortization">
+          <div class="glossary-term">Amortization</div>
+          <div class="glossary-def">The process of spreading loan payments over time so that each payment covers both interest and principal. Early payments are mostly interest; later payments are mostly principal.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Capitalization">
+          <div class="glossary-term">Capitalization</div>
+          <div class="glossary-def">When unpaid interest is added to your principal balance, causing you to pay interest on interest. Common during deferment or forbearance periods. Capitalization can significantly inflate your balance.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Deferment">
+          <div class="glossary-term">Deferment</div>
+          <div class="glossary-def">A temporary pause on loan payments, usually granted for school enrollment, economic hardship, or military service. On subsidized federal loans, interest does not accrue during deferment.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Discretionary Income">
+          <div class="glossary-term">Discretionary Income</div>
+          <div class="glossary-def">For IDR plan purposes: your adjusted gross income minus 150% of the federal poverty guideline for your family size. Your IDR payment is calculated as a percentage of this number.</div>
+        </div>
+
+        <div class="glossary-item" data-term="DTI Debt-to-Income Ratio">
+          <div class="glossary-term">DTI — Debt-to-Income Ratio</div>
+          <div class="glossary-def">Total monthly debt payments divided by gross monthly income, expressed as a percentage. Lenders use this to evaluate loan eligibility. A DTI under 36% is generally considered healthy.</div>
+        </div>
+
+        <div class="glossary-item" data-term="EFC Expected Family Contribution">
+          <div class="glossary-term">EFC — Expected Family Contribution</div>
+          <div class="glossary-def">Now called the Student Aid Index (SAI), this number calculated from your FAFSA determines how much financial aid you're eligible for. Lower EFC = more aid eligibility.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Forbearance">
+          <div class="glossary-term">Forbearance</div>
+          <div class="glossary-def">A temporary pause or reduction in loan payments, typically at the lender's discretion. Unlike deferment, interest always accrues during forbearance on all federal loan types.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Grace Period">
+          <div class="glossary-term">Grace Period</div>
+          <div class="glossary-def">A set period after leaving school before your first payment is due. Most federal student loans offer a 6-month grace period. Interest may or may not accrue depending on loan type.</div>
+        </div>
+
+        <div class="glossary-item" data-term="IBR Income-Based Repayment">
+          <div class="glossary-term">IBR — Income-Based Repayment</div>
+          <div class="glossary-def">An income-driven repayment plan that caps monthly payments at 10% (new borrowers after 7/1/2014) or 15% (older borrowers) of discretionary income. Remaining balance forgiven after 20 or 25 years.</div>
+        </div>
+
+        <div class="glossary-item" data-term="IDR Income-Driven Repayment">
+          <div class="glossary-term">IDR — Income-Driven Repayment</div>
+          <div class="glossary-def">An umbrella term for all federal repayment plans that base your monthly payment on your income and family size rather than your loan balance. Includes IBR, PAYE, SAVE, and ICR.</div>
+        </div>
+
+        <div class="glossary-item" data-term="LIBOR London Interbank Offered Rate">
+          <div class="glossary-term">LIBOR — London Interbank Offered Rate</div>
+          <div class="glossary-def">A benchmark interest rate historically used to set variable-rate private student loan rates. Now largely replaced by SOFR (Secured Overnight Financing Rate). If you have an old variable-rate loan, check which benchmark it uses.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Origination Fee">
+          <div class="glossary-term">Origination Fee</div>
+          <div class="glossary-def">A upfront charge deducted from your loan disbursement. Federal Direct loans have origination fees (~1.057% for subsidized/unsubsidized). This fee increases your effective cost and is reflected in the APR.</div>
+        </div>
+
+        <div class="glossary-item" data-term="PSLF Public Service Loan Forgiveness">
+          <div class="glossary-term">PSLF — Public Service Loan Forgiveness</div>
+          <div class="glossary-def">A federal program that forgives remaining Direct Loan balances after 120 qualifying monthly payments while working full-time for a qualifying government or nonprofit employer.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Principal">
+          <div class="glossary-term">Principal</div>
+          <div class="glossary-def">The original amount borrowed, or the remaining balance excluding interest. When you make a payment, a portion reduces the principal and a portion covers interest. Reducing principal faster saves significant interest over time.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Refinancing">
+          <div class="glossary-term">Refinancing</div>
+          <div class="glossary-def">Taking out a new loan to pay off existing loans, ideally at a lower interest rate. Refinancing federal loans into private loans is usually a bad idea — you permanently lose IDR eligibility, PSLF eligibility, and federal protections.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Servicer Loan Servicer">
+          <div class="glossary-term">Servicer</div>
+          <div class="glossary-def">The company that collects your loan payments and manages your account on behalf of the lender. For federal loans, your servicer is assigned by the Department of Education. You can change servicers through consolidation.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Subsidized Loan">
+          <div class="glossary-term">Subsidized Loan</div>
+          <div class="glossary-def">A federal student loan where the government pays the interest while you're in school at least half-time, during the grace period, and during deferment. Only available to undergraduates with financial need.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Unsubsidized Loan">
+          <div class="glossary-term">Unsubsidized Loan</div>
+          <div class="glossary-def">A federal student loan that accrues interest from the moment funds are disbursed. Available to undergrad and grad students regardless of financial need. Interest that accrues during school can capitalize when repayment begins.</div>
+        </div>
+
+        <div class="glossary-item" data-term="Variable Rate">
+          <div class="glossary-term">Variable Rate</div>
+          <div class="glossary-def">An interest rate that changes over time based on a benchmark index (like SOFR). Variable-rate loans can start lower than fixed rates but carry the risk of rising over time. Common in private student loans.</div>
+        </div>
+
+        <div class="no-results" id="no-results">No terms match your search.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" aria-labelledby="quiz-headline">
+    <div class="container">
+      <div class="quiz-header reveal">
+        <div class="chip">TEST YOURSELF</div>
+        <h2 class="section-headline" id="quiz-headline">Test Your Loan IQ</h2>
+        <p class="section-sub" style="margin: 0 auto;">5 questions. See how much you've learned.</p>
+      </div>
+      <div class="quiz-wrap reveal">
+        <div class="quiz-card" id="quiz-card">
+          <div class="quiz-progress-bar-wrap">
+            <div class="quiz-progress-bar" id="quiz-progress-bar" style="width:20%;"></div>
+          </div>
+          <div class="quiz-q-num" id="quiz-q-num">Question 1 of 5</div>
+          <div class="quiz-question" id="quiz-question"></div>
+          <div class="quiz-options" id="quiz-options"></div>
+          <div class="quiz-feedback" id="quiz-feedback"></div>
+          <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer" aria-label="Site footer">
+    <div class="container">
+      <div class="footer-main">
+        <div>
+          <a href="index.html" class="nav-logo" aria-label="LifeLaunch Loans home" style="display:inline-flex; margin-bottom:0;">
+            <div class="nav-logo-icon">
+              <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M9 2L11.5 7H16L12 10.5L13.5 15.5L9 12.5L4.5 15.5L6 10.5L2 7H6.5L9 2Z" fill="#080F0A"/>
+              </svg>
+            </div>
+            <span class="nav-logo-text">
+              <span class="bold">LifeLaunch</span><span class="light">Loans</span>
+            </span>
+          </a>
+          <p class="footer-brand-desc">Free financial literacy for the generation carrying America's $1.7 trillion student debt crisis.</p>
+          <nav class="footer-socials" aria-label="Social media links">
+            <a href="#" class="social-icon" aria-label="Follow us on X">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M4 20L20 4"/></svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="Connect on LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="View on GitHub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </nav>
+        </div>
+        <div>
+          <div class="footer-col-title">Guides</div>
+          <ul class="footer-links">
+            <li><a href="#topics">APR vs Interest Rate</a></li>
+            <li><a href="#topics">Federal vs Private</a></li>
+            <li><a href="#topics">IDR Plans</a></li>
+            <li><a href="#topics">PSLF</a></li>
+            <li><a href="#topics">Credit Score</a></li>
+            <li><a href="#topics">Repayment Strategies</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Site</div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="education.html">Education Hub</a></li>
+            <li><a href="signin.html">Sign In</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Resources</div>
+          <ul class="footer-links">
+            <li><a href="#glossary">Glossary</a></li>
+            <li><a href="#quiz">Loan IQ Quiz</a></li>
+            <li><a href="dashboard.html#simulator">Loan Simulator</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 LifeLaunch Loans, Inc. All rights reserved.</p>
+        <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+          <a href="#" style="font-family:'DM Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+          <a href="#" style="font-family:'DM Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); transition:color 0.2s;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+          <div class="hackathon-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--green)" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Built at Hackathon 2026
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── THEME TOGGLE ── */
+    (function() {
+      const saved = (() => { try { return localStorage.getItem('ll_theme'); } catch(e) { return null; } })();
+      if (saved === 'light') document.body.classList.add('light-mode');
+    })();
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-mode');
+      try { localStorage.setItem('ll_theme', isLight ? 'light' : 'dark'); } catch(e) {}
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      const isLight = document.body.classList.contains('light-mode');
+      document.querySelectorAll('.theme-toggle').forEach(btn => {
+        btn.innerHTML = isLight
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`
+          : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+      });
+    }
+    document.addEventListener('DOMContentLoaded', updateThemeIcon);
+
+    /* ── NAVBAR ── */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+    function toggleMobileMenu() {
+      const m = document.getElementById('mobile-menu');
+      m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    }
+
+    /* ── SCROLL REVEAL ── */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.closest('.topics-grid, .glossary-grid')
+            ? Array.from(entry.target.parentElement.children).indexOf(entry.target) * 60
+            : 0;
+          setTimeout(() => entry.target.classList.add('visible'), delay);
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ── TOPIC ACCORDION ── */
+    let openTopic = null;
+    function toggleTopic(num) {
+      const card = document.getElementById('card-' + num);
+      const article = document.getElementById('article-' + num);
+      const grid = document.getElementById('topics-grid');
+      const allCards = grid.querySelectorAll('.topic-card');
+      const allArticles = grid.querySelectorAll('.topic-article');
+
+      if (openTopic === num) {
+        // Close it
+        card.classList.remove('open');
+        card.setAttribute('aria-expanded', 'false');
+        article.classList.remove('open');
+        article.setAttribute('aria-hidden', 'true');
+        openTopic = null;
+        return;
+      }
+
+      // Close any open
+      allCards.forEach(c => { c.classList.remove('open'); c.setAttribute('aria-expanded', 'false'); });
+      allArticles.forEach(a => { a.classList.remove('open'); a.setAttribute('aria-hidden', 'true'); });
+
+      // Open new
+      card.classList.add('open');
+      card.setAttribute('aria-expanded', 'true');
+
+      // Position article after current row of 3
+      // Remove and re-insert article after the row containing this card
+      const cardIndex = Array.from(allCards).indexOf(card); // 0-based
+      const rowEnd = Math.floor(cardIndex / 3) * 3 + 2; // last card index in same row (0-based)
+      const cards = Array.from(allCards);
+      const referenceCard = cards[Math.min(rowEnd, cards.length - 1)];
+
+      // Insert article after the reference card (or at end of row)
+      referenceCard.after(article);
+
+      article.classList.add('open');
+      article.setAttribute('aria-hidden', 'false');
+      openTopic = num;
+
+      // Smooth scroll to article
+      setTimeout(() => {
+        article.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 80);
+    }
+
+    // Keyboard support for cards
+    document.querySelectorAll('.topic-card').forEach(card => {
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    /* ── CALC: APR vs Rate ── */
+    function fmtCurrency(n) {
+      return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function calcMonthly(P, annualRate, months) {
+      if (annualRate === 0) return P / months;
+      const r = annualRate / 12 / 100;
+      return P * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+    }
+    function calcAPR() {
+      const P = parseFloat(document.getElementById('apr-amount').value) || 30000;
+      const rate = parseFloat(document.getElementById('apr-rate').value) || 5.5;
+      const apr = parseFloat(document.getElementById('apr-apr').value) || 6.2;
+      const months = parseInt(document.getElementById('apr-term').value) || 120;
+
+      const mRate = calcMonthly(P, rate, months);
+      const mAPR = calcMonthly(P, apr, months);
+      const totalRate = mRate * months;
+      const totalApr = mAPR * months;
+
+      document.getElementById('apr-monthly-rate').textContent = fmtCurrency(mRate);
+      document.getElementById('apr-monthly-apr').textContent = fmtCurrency(mAPR);
+      document.getElementById('apr-total-rate').textContent = fmtCurrency(totalRate - P);
+      document.getElementById('apr-total-apr').textContent = fmtCurrency(totalApr - P);
+      document.getElementById('apr-diff').textContent = fmtCurrency(totalApr - totalRate);
+
+      document.getElementById('apr-result').classList.add('show');
+    }
+
+    /* ── CALC: IDR ── */
+    // 2024 poverty guidelines (continental US, approximated)
+    function getPovertyLine(familySize) {
+      const base = 14580;
+      const perPerson = 5140;
+      return base + (Math.max(1, familySize) - 1) * perPerson;
+    }
+    function calcIDR() {
+      const income = parseFloat(document.getElementById('idr-income').value) || 42000;
+      const family = parseInt(document.getElementById('idr-family').value) || 1;
+      const balance = parseFloat(document.getElementById('idr-balance').value) || 38000;
+
+      const poverty = getPovertyLine(family);
+      const discretionary150 = Math.max(0, income - poverty * 1.5);
+      const discretionary100 = Math.max(0, income - poverty);
+
+      const ibrPayment = (discretionary150 * 0.10) / 12;
+      const payePayment = (discretionary150 * 0.10) / 12;
+      const savePayment = (discretionary100 * 0.05) / 12; // simplified — undergrad portion
+      const icrPayment = (discretionary100 * 0.20) / 12;
+
+      // Standard 10-year at average 6% rate
+      const standardPayment = calcMonthly(balance, 6.0, 120);
+
+      document.getElementById('idr-ibr').textContent = fmtCurrency(Math.max(0, ibrPayment)) + '/mo';
+      document.getElementById('idr-paye').textContent = fmtCurrency(Math.max(0, payePayment)) + '/mo';
+      document.getElementById('idr-save').textContent = fmtCurrency(Math.max(0, savePayment)) + '/mo';
+      document.getElementById('idr-icr').textContent = fmtCurrency(Math.max(0, icrPayment)) + '/mo';
+      document.getElementById('idr-standard').textContent = fmtCurrency(standardPayment) + '/mo';
+
+      document.getElementById('idr-result').classList.add('show');
+    }
+
+    /* ── CALC: DTI ── */
+    function calcDTI() {
+      const debt = parseFloat(document.getElementById('dti-debt').value) || 0;
+      const income = parseFloat(document.getElementById('dti-income').value) || 1;
+      const dti = (debt / income) * 100;
+
+      let assess, color;
+      if (dti <= 20) { assess = 'Excellent — well below threshold'; color = 'var(--green)'; }
+      else if (dti <= 36) { assess = 'Good — most lenders approve'; color = 'var(--green)'; }
+      else if (dti <= 43) { assess = 'Fair — some lenders may approve'; color = 'var(--amber)'; }
+      else if (dti <= 50) { assess = 'High — difficulty qualifying'; color = 'var(--amber)'; }
+      else { assess = 'Very high — likely to be denied'; color = '#f87171'; }
+
+      const pctEl = document.getElementById('dti-pct');
+      const assessEl = document.getElementById('dti-assess');
+      pctEl.textContent = dti.toFixed(1) + '%';
+      pctEl.style.color = color;
+      assessEl.textContent = assess;
+      assessEl.style.color = color;
+
+      document.getElementById('dti-result').classList.add('show');
+    }
+
+    /* ── PSLF CHECKLIST ── */
+    function toggleCheck(li) {
+      li.classList.toggle('checked');
+    }
+
+    /* ── GLOSSARY FILTER ── */
+    function filterGlossary() {
+      const query = document.getElementById('glossary-search').value.toLowerCase().trim();
+      const items = document.querySelectorAll('.glossary-item');
+      let visibleCount = 0;
+      items.forEach(item => {
+        const text = item.getAttribute('data-term').toLowerCase();
+        const def = item.querySelector('.glossary-def').textContent.toLowerCase();
+        const match = text.includes(query) || def.includes(query);
+        item.classList.toggle('hidden', !match);
+        if (match) visibleCount++;
+      });
+      const noResults = document.getElementById('no-results');
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    /* ── QUIZ ── */
+    const quizData = [
+      {
+        question: "What does APR stand for?",
+        options: ["Annual Principal Rate", "Annual Percentage Rate", "Applied Payment Ratio", "Average Prime Rate"],
+        correct: 1,
+        explanation: "APR stands for Annual Percentage Rate — it includes both the interest rate and any fees, giving you the true cost of borrowing."
+      },
+      {
+        question: "Which loan type is eligible for Public Service Loan Forgiveness (PSLF)?",
+        options: ["Private student loans", "FFEL loans (as-is)", "Federal Direct Loans", "Perkins Loans (as-is)"],
+        correct: 2,
+        explanation: "Only Federal Direct Loans qualify for PSLF. FFEL and Perkins loans must be consolidated into a Direct Consolidation Loan first."
+      },
+      {
+        question: "What is the mathematically optimal debt repayment strategy?",
+        options: ["Snowball method", "Standard repayment", "Avalanche method", "Minimum payments only"],
+        correct: 2,
+        explanation: "The Avalanche method — targeting the highest interest rate first — minimizes total interest paid and is mathematically optimal."
+      },
+      {
+        question: "What percentage of your credit score is determined by payment history?",
+        options: ["10%", "20%", "30%", "35%"],
+        correct: 3,
+        explanation: "Payment history accounts for 35% of your FICO score — the single largest factor. One missed payment can drop your score by 60–110 points."
+      },
+      {
+        question: "What is the income threshold used to calculate discretionary income for IBR?",
+        options: ["100% of the federal poverty line", "125% of the federal poverty line", "150% of the federal poverty line", "200% of the federal poverty line"],
+        correct: 2,
+        explanation: "IBR and most IDR plans define discretionary income as AGI minus 150% of the federal poverty guideline for your family size."
+      }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      const q = quizData[currentQ];
+      document.getElementById('quiz-q-num').textContent = `Question ${currentQ + 1} of ${quizData.length}`;
+      document.getElementById('quiz-question').textContent = q.question;
+      document.getElementById('quiz-feedback').textContent = '';
+      document.getElementById('quiz-feedback').className = 'quiz-feedback';
+      document.getElementById('quiz-next-btn').classList.remove('show');
+      document.getElementById('quiz-progress-bar').style.width = ((currentQ + 1) / quizData.length * 100) + '%';
+
+      const optionsEl = document.getElementById('quiz-options');
+      optionsEl.innerHTML = '';
+      answered = false;
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(i);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selectedIndex) {
+      if (answered) return;
+      answered = true;
+      const q = quizData[currentQ];
+      const buttons = document.querySelectorAll('.quiz-option');
+      buttons.forEach(b => b.disabled = true);
+      buttons[q.correct].classList.add('correct');
+      const feedbackEl = document.getElementById('quiz-feedback');
+      if (selectedIndex === q.correct) {
+        score++;
+        buttons[selectedIndex].classList.add('correct');
+        feedbackEl.textContent = 'Correct! ' + q.explanation;
+        feedbackEl.className = 'quiz-feedback correct-fb';
+      } else {
+        buttons[selectedIndex].classList.add('wrong');
+        feedbackEl.textContent = 'Not quite. ' + q.explanation;
+        feedbackEl.className = 'quiz-feedback wrong-fb';
+      }
+      const nextBtn = document.getElementById('quiz-next-btn');
+      nextBtn.textContent = currentQ < quizData.length - 1 ? 'Next Question \u2192' : 'See My Score';
+      nextBtn.classList.add('show');
+    }
+
+    function nextQuestion() {
+      currentQ++;
+      if (currentQ >= quizData.length) {
+        showScore();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showScore() {
+      const isGood = score > 3;
+      const card = document.getElementById('quiz-card');
+      card.innerHTML = `
+        <div class="quiz-score-card">
+          <div class="quiz-score-num ${isGood ? 'green' : 'amber'}">${score}/${quizData.length}</div>
+          <div class="quiz-score-label">${isGood ? 'Strong work!' : 'Keep learning!'}</div>
+          <p class="quiz-score-sub">${isGood
+            ? 'You clearly know your loan basics. Explore the guides above to go even deeper.'
+            : 'You got ' + score + ' out of 5. Read through the topic guides above and try again.'
+          }</p>
+          <button class="quiz-retake-btn" onclick="retakeQuiz()">Retake Quiz</button>
+        </div>
+      `;
+    }
+
+    function retakeQuiz() {
+      currentQ = 0;
+      score = 0;
+      const card = document.getElementById('quiz-card');
+      card.innerHTML = `
+        <div class="quiz-progress-bar-wrap">
+          <div class="quiz-progress-bar" id="quiz-progress-bar" style="width:20%;"></div>
+        </div>
+        <div class="quiz-q-num" id="quiz-q-num"></div>
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+        <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuestion()">Next Question &rarr;</button>
+      `;
+      renderQuestion();
+    }
+
+    // Init quiz
+    renderQuestion();
+  </script>
+</body>
+</html>
