@@ -1085,8 +1085,51 @@ body.light-mode input::placeholder { color: rgba(22,101,52,0.4) !important; }
           <span class="chip personal active">Personal</span>
         </div>
         <div class="panel-header-spacer"></div>
-        <button class="add-btn">+ Add</button>
+        <button class="add-btn" onclick="toggleAdvAddForm()">+ Add</button>
       </div>
+
+      <!-- Inline Add Loan Form -->
+      <div id="adv-add-form" style="display:none; padding:8px 10px; border-bottom:1px solid var(--panel-border); background:var(--surface2);">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:6px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">LOAN NAME</div>
+            <input id="adv-f-label" type="text" maxlength="40" placeholder="e.g. Student Loan" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--sans);font-size:11px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--panel-border)'" />
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">TYPE</div>
+            <select id="adv-f-type" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--sans);font-size:11px;color:var(--text-primary);outline:none;">
+              <option value="student">Student</option>
+              <option value="auto">Auto</option>
+              <option value="personal">Personal</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">PRINCIPAL ($)</div>
+            <input id="adv-f-principal" type="number" min="1" max="10000000" step="0.01" placeholder="25000" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:11px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--panel-border)'" />
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">BALANCE ($)</div>
+            <input id="adv-f-balance" type="number" min="0" max="10000000" step="0.01" placeholder="25000" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:11px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--panel-border)'" />
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">RATE (% APR)</div>
+            <input id="adv-f-rate" type="number" min="0" max="100" step="0.01" placeholder="5.50" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:11px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--panel-border)'" />
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-bottom:3px;">TERM (MONTHS)</div>
+            <input id="adv-f-term" type="number" min="1" max="600" step="1" placeholder="120" style="width:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--panel-border);border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:11px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--panel-border)'" />
+          </div>
+        </div>
+        <div id="adv-form-error" style="display:none;font-family:var(--sans);font-size:10px;color:var(--amber);margin-bottom:6px;"></div>
+        <div style="display:flex;gap:6px;justify-content:flex-end;">
+          <button onclick="toggleAdvAddForm()" style="background:none;border:1px solid var(--panel-border);color:var(--text-muted);border-radius:3px;padding:4px 12px;font-family:var(--sans);font-size:11px;cursor:pointer;">Cancel</button>
+          <button onclick="submitAdvLoan()" style="background:var(--green);color:#000;border:none;border-radius:3px;padding:4px 14px;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;">Add Loan</button>
+        </div>
+      </div>
+
       <div class="panel-body">
         <div class="tbl-scroll">
           <table class="data-table">
@@ -2383,6 +2426,65 @@ function onStrategyChange() {
     tabBtn.classList.add('active');
     renderAmortTable();
   }
+}
+
+/* ═══════════════════════════════════════
+   ADD LOAN — PANEL A INLINE FORM
+═══════════════════════════════════════ */
+function toggleAdvAddForm() {
+  const form = document.getElementById('adv-add-form');
+  const btn  = document.querySelector('.add-btn');
+  if (!form) return;
+  const isOpen = form.style.display !== 'none';
+  form.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '+ Add' : '✕ Close';
+  if (!isOpen) {
+    ['adv-f-label','adv-f-principal','adv-f-balance','adv-f-rate','adv-f-term'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('adv-form-error').style.display = 'none';
+    setTimeout(() => { const el = document.getElementById('adv-f-label'); if(el) el.focus(); }, 50);
+  }
+}
+
+function submitAdvLoan() {
+  const label      = (document.getElementById('adv-f-label').value || '').trim();
+  const type       = document.getElementById('adv-f-type').value;
+  const principal  = Math.abs(parseFloat(document.getElementById('adv-f-principal').value));
+  const balance    = Math.abs(parseFloat(document.getElementById('adv-f-balance').value));
+  const rate       = Math.abs(parseFloat(document.getElementById('adv-f-rate').value));
+  const termMonths = Math.abs(parseInt(document.getElementById('adv-f-term').value));
+  const errEl      = document.getElementById('adv-form-error');
+
+  function showErr(msg) { errEl.textContent = '⚠ ' + msg; errEl.style.display = 'block'; }
+
+  if (!label)                              return showErr('Loan name is required.');
+  if (isNaN(principal) || principal <= 0)  return showErr('Principal must be greater than $0.');
+  if (isNaN(balance)   || balance < 0)     return showErr('Balance cannot be negative.');
+  if (balance > principal)                 return showErr('Balance cannot exceed original principal.');
+  if (isNaN(rate)      || rate < 0)        return showErr('Rate cannot be negative.');
+  if (rate > 100)                          return showErr('Rate cannot exceed 100%.');
+  if (isNaN(termMonths) || termMonths < 1) return showErr('Term must be at least 1 month.');
+  if (termMonths > 600)                    return showErr('Term cannot exceed 600 months.');
+
+  errEl.style.display = 'none';
+
+  const r  = rate / 100 / 12;
+  const mp = r > 0
+    ? parseFloat((principal * r * Math.pow(1+r,termMonths) / (Math.pow(1+r,termMonths)-1)).toFixed(2))
+    : parseFloat((principal / termMonths).toFixed(2));
+
+  LOANS.push({ id:'loan_'+Date.now(), label, type, principal, balance, rate, termMonths, monthlyPayment: mp });
+
+  try { renderLoanTracker(); }  catch(e) {}
+  try { renderAmortTable(); }   catch(e) {}
+  try { renderRefiTable(); }    catch(e) {}
+  try { renderBalanceChart(); } catch(e) {}
+  try { renderBalanceBars(); }  catch(e) {}
+  try { renderStackedBar(); }   catch(e) {}
+
+  toggleAdvAddForm();
+  showApplyToast(label, 'Loan Added', mp);
 }
 
 function toggleSidebar() {
